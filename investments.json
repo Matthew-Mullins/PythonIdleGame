@@ -1,0 +1,84 @@
+{
+    "investments": [
+        {
+            "type": "lemonade_stand",
+            "name": "[1] Lemonade Stand",
+            "initial_cost": 3.738,
+            "coefficient": 1.07,
+            "initial_time": 0.6,
+            "initial_revenue": 1
+        },
+        {
+            "type": "newspaper_delivery",
+            "name": "[2] Newspaper Delivery",
+            "initial_cost": 60,
+            "coefficient": 1.15,
+            "initial_time": 3,
+            "initial_revenue": 60
+        },
+        {
+            "type": "car_wash",
+            "name": "[3] Car Wash",
+            "initial_cost": 720,
+            "coefficient": 1.14,
+            "initial_time": 6,
+            "initial_revenue": 540
+        },
+        {
+            "type": "pizza_delivery",
+            "name": "[4] Pizza Delivery",
+            "initial_cost": 8640,
+            "coefficient": 1.13,
+            "initial_time": 12,
+            "initial_revenue": 4320
+        },
+        {
+            "type": "donut_shop",
+            "name": "[5] Donut Shop",
+            "initial_cost": 103680,
+            "coefficient": 1.12,
+            "initial_time": 24,
+            "initial_revenue": 51840
+        },
+        {
+            "type": "shrimp_boat",
+            "name": "[6] Shrimp Boat",
+            "initial_cost": 1244160,
+            "coefficient": 1.11,
+            "initial_time": 96,
+            "initial_revenue": 622080
+        },
+        {
+            "type": "hockey_team",
+            "name": "[7] Hockey Team",
+            "initial_cost": 14929920,
+            "coefficient": 1.10,
+            "initial_time": 384,
+            "initial_revenue": 7464960
+        },
+        {
+            "type": "movie_studio",
+            "name": "[8] Movie Studio",
+            "initial_cost": 179159040,
+            "coefficient": 1.09,
+            "initial_time": 1536,
+            "initial_revenue": 89579520
+        },
+        {
+            "type": "bank",
+            "name": "[9] Bank",
+            "initial_cost": 2149908480,
+            "coefficient": 1.08,
+            "initial_time": 6144,
+            "initial_revenue": 1074954240
+        },
+        {
+            "type": "oil_company",
+            "name": "[0] Oil Company",
+            "initial_cost": 25798901760,
+            "coefficient": 1.07,
+            "initial_time": 36864,
+            "initial_revenue": 29688737024
+        }
+    ]
+}

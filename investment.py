@@ -1,3 +1,5 @@
+import math
+import time
 import pygame
 
 def truncate_value(value):
@@ -15,126 +17,134 @@ def truncate_value(value):
 
     new_val = value
     suffix = ''
-    if value < MILLION:
+    if value < THOUSAND:
+        new_val = value
+        suffix = '  '
+    elif value < MILLION:
         new_val /= float(THOUSAND)
-        suffix = 'thousand'
+        suffix = 'THO'
     elif value < BILLION:
         new_val /= float(MILLION)
-        suffix = 'million'
+        suffix = 'MIL'
     elif value < TRILLION:
         new_val /= float(BILLION)
-        suffix = 'billion'
+        suffix = 'BIL'
     elif value < QUADRILLION:
         new_val /= float(TRILLION)
-        suffix = 'trillion'
+        suffix = 'TRI'
+    elif value < QUINTILLION:
+        new_val /= float(QUADRILLION)
+        suffix = 'QUA'
+    elif value < SEXTILLION:
+        new_val /= float(QUINTILLION)
+        suffix = 'QUI'
+    elif value < SEPTILLION:
+        new_val /= float(SEXTILLION)
+        suffix = 'SEX'
+    elif value < OCTILLION:
+        new_val /= float(SEPTILLION)
+        suffix = 'SEP'
+    elif value < NONILLION:
+        new_val /= float(OCTILLION)
+        suffix = 'OCT'
+    elif value < DECILLION:
+        new_val /= float(NONILLION)
+        suffix = 'NON'
     else:
-        new_val = 0
-        suffix = 'someting'
+        new_val /= float(DECILLION)
+        suffix = 'DEC'
     return (new_val, suffix)
 
 class Investment:
-    def __init__(self, game):
+    SPACING = 16
+
+    def __init__(self, game, inv_dict):
         self.game = game
-        self.name = ''
-        self.level = 0
-        self.initial_revenue = 0
+        self.quantity = 0
+        self.type = inv_dict['type']
+        self.name = inv_dict['name']
+        self.initial_cost = inv_dict['initial_cost']
+        self.cost = self.initial_cost
+        self.coefficient = inv_dict['coefficient']
+        self.initial_time = inv_dict['initial_time']
+        self.start_time = time.time()
+        self.time = self.initial_time
+        self.time_left = self.time
+        self.initial_revenue = inv_dict['initial_revenue']
         self.revenue = 0
         self.revenue_scale = 1
-        self.initial_cost = 0
-        self.cost = 0
-        self.upgrade_scale = 0
 
-    def upgrade(self):
+    def get_upgrade_cost(self, number):
+        sum = self.cost * self.coefficient
+        for i in range(1, number):
+            sum += sum * self.coefficient
+        return sum
+
+    def purchase(self):
         if self.game.currency < self.cost:
             return
         self.game.currency -= self.cost
-        self.level += 1
-        if self.level % 10 == 0 and self.level != 0:
-            self.revenue_scale += 1
-        self.revenue = self.level * self.initial_revenue * self.revenue_scale
-        self.cost *= self.upgrade_scale
+        self.upgrade()
 
-    def load(self, level):
-        for i in range(level):
-            self.level += 1
-            if self.level % 10 == 0 and self.level != 0:
-                self.revenue_scale += 1
-            self.revenue = self.level * self.initial_revenue * self.revenue_scale
-            self.cost *= self.upgrade_scale
+    def upgrade(self):
+        self.quantity += 1
+        if self.quantity % 10 == 0 and self.quantity != 0:
+            self.revenue_scale += 1
+        if self.quantity % 100 == 0 and self.quantity != 0:
+            self.time /= 2
+        self.revenue = self.quantity * self.initial_revenue * self.revenue_scale
+        self.cost *= self.coefficient
+
+    def update(self, game):
+        if self.quantity > 0:
+            cur_time = time.time()
+            self.time_left = self.start_time + self.time - cur_time
+            if self.time_left <= 0:
+                self.time_left = self.time
+                self.start_time = cur_time
+                self.game.currency += self.revenue
 
     def render(self, position=(0, 0)):
         # Display Text
-        self.font = pygame.font.Font(None, 36)
-        name_text = self.font.render(self.name, 1, (255, 255, 255))
+        name_text = self.game.font.render(self.name, 1, (255, 255, 255))
         name_text_pos = name_text.get_rect()
         name_text_pos.topleft = self.game.background.get_rect().topleft
         name_text_pos.x += position[0]
-        name_text_pos.y += position[1] + 30
+        name_text_pos.y += position[1] + (Investment.SPACING * self.game.background.get_height() / 450)
         self.game.background.blit(name_text, name_text_pos)
 
-        level_text = self.font.render('Level: ' + str(self.level), 1, (255, 255, 255))
-        level_text_pos = level_text.get_rect()
-        level_text_pos.topleft = self.game.background.get_rect().topleft
-        level_text_pos.x += position[0]
-        level_text_pos.y += position[1] + 60
-        self.game.background.blit(level_text, level_text_pos)
+        quantity_text = self.game.font.render('Level: ' + str(self.quantity), 1, (255, 255, 255))
+        quantity_text_pos = quantity_text.get_rect()
+        quantity_text_pos.topleft = self.game.background.get_rect().topleft
+        quantity_text_pos.x += position[0]
+        quantity_text_pos.y += position[1] + (2 * Investment.SPACING * self.game.background.get_height() / 450)
+        self.game.background.blit(quantity_text, quantity_text_pos)
 
         revenue, suffix = truncate_value(self.revenue)
-        revenue_text = self.font.render('Revenue: ' + str(round(revenue, 2)) + ' ' + suffix, 1, (255, 255, 255))
-        revenue_text_pos = level_text.get_rect()
+        revenue_text = self.game.font.render('Revenue: ' + format(revenue, '6.2f') + ' ' + suffix, 1, (255, 255, 255))
+        revenue_text_pos = revenue_text.get_rect()
         revenue_text_pos.topleft = self.game.background.get_rect().topleft
         revenue_text_pos.x += position[0]
-        revenue_text_pos.y += position[1] + 90
+        revenue_text_pos.y += position[1] + (3 * Investment.SPACING * self.game.background.get_height() / 450)
         self.game.background.blit(revenue_text, revenue_text_pos)
 
         cost, suffix = truncate_value(self.cost)
-        upgrade_text = self.font.render('Upgrade: ' + str(round(cost, 2)) + ' ' + suffix, 1, (255, 255, 255))
+        upgrade_text = self.game.font.render('Upgrade: ' + format(cost, '6.2f') + ' ' + suffix, 1, (255, 255, 255))
         upgrade_text_pos = upgrade_text.get_rect()
         upgrade_text_pos.topleft = self.game.background.get_rect().topleft
         upgrade_text_pos.x += position[0]
-        upgrade_text_pos.y += position[1] + 120
+        upgrade_text_pos.y += position[1] + (4 * Investment.SPACING * self.game.background.get_height() / 450)
         self.game.background.blit(upgrade_text, upgrade_text_pos)
 
-class LemonadeStand(Investment):
-    def __init__(self, game):
-        Investment.__init__(self, game)
-        self.name = 'Lemonade Stand'
-        self.level = 1
-        self.initial_revenue = 1
-        self.revenue = self.initial_revenue
-        self.initial_cost = 4
-        self.cost = self.initial_cost
-        self.upgrade_scale = 1.07
-
-class HotdogStand(Investment):
-    def __init__(self, game):
-        Investment.__init__(self, game)
-        self.name = 'Hotdog Stand'
-        self.level = 0
-        self.initial_revenue = 60
-        self.revenue = 0
-        self.initial_cost = 60
-        self.cost = self.initial_cost
-        self.upgrade_scale = 1.15
-
-class CarWash(Investment):
-    def __init__(self, game):
-        Investment.__init__(self, game)
-        self.name = 'Car Wash'
-        self.level = 0
-        self.initial_revenue = 540
-        self.revenue = 0
-        self.initial_cost = 720
-        self.cost = self.initial_cost
-        self.upgrade_scale = 1.14
-
-class PizzaDelivery(Investment):
-    def __init__(self, game):
-        Investment.__init__(self, game)
-        self.name = 'Pizza Delivery'
-        self.level = 0
-        self.initial_revenue = 4320
-        self.revenue = 0
-        self.initial_cost = 8640
-        self.cost = self.initial_cost
-        self.upgrade_scale = 1.13
+        if self.quantity > 0:
+            max_width = (200 * self.game.background.get_width() / 800)
+            height = (15 * self.game.background.get_height() / 450)
+            progress = 0
+            if self.time > 0.15:
+                progress = 1. - ((self.time_left) / (self.time))
+                pygame.draw.rect(self.game.background, (255 - (255 * progress), 0 + (255 * progress), 0), pygame.Rect(position[0], position[1] + (5 * Investment.SPACING * self.game.background.get_height() / 450), max_width * progress, height))
+                pygame.draw.rect(self.game.background, (128, 128, 128), pygame.Rect(position[0], position[1] + (5 * Investment.SPACING * self.game.background.get_height() / 450), max_width, height), 1)
+            else:
+                progress = 100
+                pygame.draw.rect(self.game.background, (0, 255, 0), pygame.Rect(position[0], position[1] + (5 * Investment.SPACING * self.game.background.get_height() / 450), max_width, height))
+                pygame.draw.rect(self.game.background, (128, 128, 128), pygame.Rect(position[0], position[1] + (5 * Investment.SPACING * self.game.background.get_height() / 450), max_width, height), 1)
