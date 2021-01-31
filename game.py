@@ -4,15 +4,19 @@ import math
 import pygame
 
 from investment import *
+from player import Player
 from button import Button
 
 class Game:
     INVESTMENTS_FP = "investments.json"
 
+    INIT_W = 800
+    INIT_H = 450
+
     def __init__(self):
         # Initialize Screen
         pygame.init()
-        self.screen = pygame.display.set_mode((800, 450), pygame.RESIZABLE)
+        self.screen = pygame.display.set_mode((Game.INIT_W, Game.INIT_H), pygame.RESIZABLE)
         pygame.display.set_caption('Basic Idle Game')
         self.font = pygame.font.Font("VT323-Regular.ttf", 16)
 
@@ -28,32 +32,17 @@ class Game:
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
 
-        # Inialize Values
-        self.currency = 0
+        # Create Player Object to Track Saveable Data
+        self.player = Player(self)
 
-        # Create Investments
-        self.investments = {}
+        # Instantiate Investments from Json
         with open(Game.INVESTMENTS_FP, "r") as f:
             data = json.load(f)
-            for investment in data['investments']:
-                self.investments[investment['type']] = Investment(self, investment)
+            for investment_dict in data.get('investments'):
+                self.player.investments[investment_dict.get('type')] = Investment(self, investment_dict)
 
-        # Try to Load Player Data from File
-        try:
-            f = open("player_data.json", "r")
-            player_data = json.load(f)
-            self.currency = player_data['currency']
-            for investment in self.investments.values():
-                if investment.type == 'lemonade_stand' and player_data['investments'][investment.type] == 0:
-                    investment.upgrade()
-                    continue
-                for i in range(player_data['investments'][investment.type]):
-                    investment.upgrade()
-            f.close()
-        except:
-            for investment in self.investments.values():
-                if investment.type == 'lemonade_stand':
-                    investment.upgrade()
+        # Load Player Save
+        self.player.load()
 
         # Event Loop
         while True:
@@ -65,8 +54,11 @@ class Game:
                 if event.type == pygame.QUIT:
                     return
                 if event.type == pygame.VIDEORESIZE:
-                    new_screen_size = event.dict['size']
+                    # Maintain Aspect Ratio
                     ASPECT_RATIO = 16. / 9.
+                    # Get New Screen Size
+                    new_screen_size = event.dict['size']
+                    # Calculate Background Size to Fit Screen
                     if new_screen_size[0] > ASPECT_RATIO * new_screen_size[1]:
                         new_screen_height = int(new_screen_size[1])
                         new_screen_width = int(new_screen_height * ASPECT_RATIO)
@@ -77,51 +69,43 @@ class Game:
                     self.background = pygame.transform.scale(self.background, (new_screen_width, new_screen_height))
                     self.font = pygame.font.Font("VT323-Regular.ttf", int(16 * new_screen_height / 450))
                 if event.type == self.AUTO_SAVE:
-                    investment_data = {}
-                    for investment in self.investments.values():
-                        investment_data[investment.type] = investment.quantity
-                    player_data = {
-                        "currency": self.currency,
-                        "investments": investment_data
-                    }
-                    with open("player_data.json", "w") as f:
-                        json.dump(player_data, f)
+                    self.player.save()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_1:
-                    investment = self.investments["lemonade_stand"]
+                    investment = self.player.investments["lemonade_stand"]
                     investment.purchase()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_2:
-                    investment = self.investments["newspaper_delivery"]
+                    investment = self.player.investments["newspaper_delivery"]
                     investment.purchase()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_3:
-                    investment = self.investments["car_wash"]
+                    investment = self.player.investments["car_wash"]
                     investment.purchase()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_4:
-                    investment = self.investments["pizza_delivery"]
+                    investment = self.player.investments["pizza_delivery"]
                     investment.purchase()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_5:
-                    investment = self.investments["donut_shop"]
+                    investment = self.player.investments["donut_shop"]
                     investment.purchase()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_6:
-                    investment = self.investments["shrimp_boat"]
+                    investment = self.player.investments["shrimp_boat"]
                     investment.purchase()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_7:
-                    investment = self.investments["hockey_team"]
+                    investment = self.player.investments["hockey_team"]
                     investment.purchase()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_8:
-                    investment = self.investments["movie_studio"]
+                    investment = self.player.investments["movie_studio"]
                     investment.purchase()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_9:
-                    investment = self.investments["bank"]
+                    investment = self.player.investments["bank"]
                     investment.purchase()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_0:
-                    investment = self.investments["oil_company"]
+                    investment = self.player.investments["oil_company"]
                     investment.purchase()
                 
             self.draw_currency()
             index = 0
-            for investment in self.investments.values():
+            for investment in self.player.investments.values():
                 investment.update(self)
-                investment.render(((index % 2) * int(200 * self.background.get_width() / 800), (int(index / 2)) * int(85 * self.background.get_height() / 450)))
+                investment.render((int(190 * self.background.get_width() / 800) + (index % 2) * int(305 * self.background.get_width() / 800), int(25 * self.background.get_height() / 450) + (int(index / 2)) * int(85 * self.background.get_height() / 450)))
                 index += 1
             # Blit Everything to Screen
             center_background_w = self.screen.get_width() // 2 - self.background.get_width() // 2
@@ -129,9 +113,12 @@ class Game:
             self.screen.blit(self.background, (center_background_w, center_background_h))
             pygame.display.flip()
 
+        pygame.quit()
+        quit()
+
     def draw_currency(self):
         # Display Text
-        currency, suffix = truncate_value(self.currency)
+        currency, suffix = truncate_value(self.player.currency)
         text = self.font.render('$' + format(currency, '6.2f') + ' ' + suffix, 1, (255, 255, 255))
         textpos = text.get_rect()
         textpos.midtop = self.background.get_rect().midtop

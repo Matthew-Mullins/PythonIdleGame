@@ -22,37 +22,37 @@ def truncate_value(value):
         suffix = '  '
     elif value < MILLION:
         new_val /= float(THOUSAND)
-        suffix = 'THO'
+        suffix = 'THOUSAND'
     elif value < BILLION:
         new_val /= float(MILLION)
-        suffix = 'MIL'
+        suffix = 'MILLION'
     elif value < TRILLION:
         new_val /= float(BILLION)
-        suffix = 'BIL'
+        suffix = 'BILLION'
     elif value < QUADRILLION:
         new_val /= float(TRILLION)
-        suffix = 'TRI'
+        suffix = 'TRILLION'
     elif value < QUINTILLION:
         new_val /= float(QUADRILLION)
-        suffix = 'QUA'
+        suffix = 'QUADRILLION'
     elif value < SEXTILLION:
         new_val /= float(QUINTILLION)
-        suffix = 'QUI'
+        suffix = 'QUINTILLION'
     elif value < SEPTILLION:
         new_val /= float(SEXTILLION)
-        suffix = 'SEX'
+        suffix = 'SEXTILLION'
     elif value < OCTILLION:
         new_val /= float(SEPTILLION)
-        suffix = 'SEP'
+        suffix = 'SEPTILLION'
     elif value < NONILLION:
         new_val /= float(OCTILLION)
-        suffix = 'OCT'
+        suffix = 'OCTILLION'
     elif value < DECILLION:
         new_val /= float(NONILLION)
-        suffix = 'NON'
+        suffix = 'NONILLION'
     else:
         new_val /= float(DECILLION)
-        suffix = 'DEC'
+        suffix = 'DECILLION'
     return (new_val, suffix)
 
 class Investment:
@@ -81,9 +81,9 @@ class Investment:
         return sum
 
     def purchase(self):
-        if self.game.currency < self.cost:
+        if self.game.player.currency < self.cost:
             return
-        self.game.currency -= self.cost
+        self.game.player.currency -= self.cost
         self.upgrade()
 
     def upgrade(self):
@@ -102,49 +102,93 @@ class Investment:
             if self.time_left <= 0:
                 self.time_left = self.time
                 self.start_time = cur_time
-                self.game.currency += self.revenue
+                self.game.player.currency += self.revenue
 
     def render(self, position=(0, 0)):
-        # Display Text
-        name_text = self.game.font.render(self.name, 1, (255, 255, 255))
-        name_text_pos = name_text.get_rect()
-        name_text_pos.topleft = self.game.background.get_rect().topleft
-        name_text_pos.x += position[0]
-        name_text_pos.y += position[1] + (Investment.SPACING * self.game.background.get_height() / 450)
-        self.game.background.blit(name_text, name_text_pos)
-
-        quantity_text = self.game.font.render('Level: ' + str(self.quantity), 1, (255, 255, 255))
+        # Background Size
+        bg_w = self.game.background.get_width()
+        bg_h = self.game.background.get_height()
+        investment_w = 300 * bg_w // self.game.INIT_W
+        investment_h = 80 * bg_h // self.game.INIT_H
+        # Investment Surface
+        investment_surface = pygame.Surface((investment_w, investment_h))
+        investment_rect = investment_surface.get_rect()
+        investment_surface.convert()
+        # Add Button
+        start_button = pygame.draw.circle(investment_surface, (128, 128, 128), (investment_h // 2, investment_h // 2), investment_h // 2, 2)
+        # Investment Quantity
+        quantity_text = self.game.font.render(str(self.quantity), 1, (255, 255, 255))
         quantity_text_pos = quantity_text.get_rect()
-        quantity_text_pos.topleft = self.game.background.get_rect().topleft
-        quantity_text_pos.x += position[0]
-        quantity_text_pos.y += position[1] + (2 * Investment.SPACING * self.game.background.get_height() / 450)
-        self.game.background.blit(quantity_text, quantity_text_pos)
-
-        revenue, suffix = truncate_value(self.revenue)
-        revenue_text = self.game.font.render('Revenue: ' + format(revenue, '6.2f') + ' ' + suffix, 1, (255, 255, 255))
-        revenue_text_pos = revenue_text.get_rect()
-        revenue_text_pos.topleft = self.game.background.get_rect().topleft
-        revenue_text_pos.x += position[0]
-        revenue_text_pos.y += position[1] + (3 * Investment.SPACING * self.game.background.get_height() / 450)
-        self.game.background.blit(revenue_text, revenue_text_pos)
-
-        cost, suffix = truncate_value(self.cost)
-        upgrade_text = self.game.font.render('Upgrade: ' + format(cost, '6.2f') + ' ' + suffix, 1, (255, 255, 255))
-        upgrade_text_pos = upgrade_text.get_rect()
-        upgrade_text_pos.topleft = self.game.background.get_rect().topleft
-        upgrade_text_pos.x += position[0]
-        upgrade_text_pos.y += position[1] + (4 * Investment.SPACING * self.game.background.get_height() / 450)
-        self.game.background.blit(upgrade_text, upgrade_text_pos)
-
+        quantity_text_pos.midbottom = start_button.midbottom
+        investment_surface.blit(quantity_text, quantity_text_pos)
+        # Revenue Surface
+        revenue_w = investment_w - investment_h
+        revenue_h = investment_h // 2
+        revenue_surface = pygame.Surface((revenue_w, revenue_h))
+        revenue_rect = revenue_surface.get_rect()
+        revenue_surface.convert()
+        # Progress Bar
         if self.quantity > 0:
-            max_width = (200 * self.game.background.get_width() / 800)
-            height = (15 * self.game.background.get_height() / 450)
+            max_width = revenue_w
+            height = revenue_h
             progress = 0
             if self.time > 0.15:
                 progress = 1. - ((self.time_left) / (self.time))
-                pygame.draw.rect(self.game.background, (255 - (255 * progress), 0 + (255 * progress), 0), pygame.Rect(position[0], position[1] + (5 * Investment.SPACING * self.game.background.get_height() / 450), max_width * progress, height))
-                pygame.draw.rect(self.game.background, (128, 128, 128), pygame.Rect(position[0], position[1] + (5 * Investment.SPACING * self.game.background.get_height() / 450), max_width, height), 1)
             else:
-                progress = 100
-                pygame.draw.rect(self.game.background, (0, 255, 0), pygame.Rect(position[0], position[1] + (5 * Investment.SPACING * self.game.background.get_height() / 450), max_width, height))
-                pygame.draw.rect(self.game.background, (128, 128, 128), pygame.Rect(position[0], position[1] + (5 * Investment.SPACING * self.game.background.get_height() / 450), max_width, height), 1)
+                progress = 1
+            pygame.draw.rect(revenue_surface, (128 - (128 * progress), 0 + (128 * progress), 0), pygame.Rect(revenue_rect.left, revenue_rect.top, revenue_rect.width * progress, revenue_rect.height))
+            pygame.draw.rect(revenue_surface, (128, 128, 128), revenue_rect, 1)
+        # Revenue Text
+        revenue, suffix = truncate_value(self.revenue)
+        revenue_text = self.game.font.render(format(revenue, '6.2f'), 1, (255, 255, 255))
+        revenue_text_pos = revenue_text.get_rect()
+        revenue_text_pos.midtop = revenue_rect.midtop
+        revenue_surface.blit(revenue_text, revenue_text_pos)
+        # Revenue Suffix Text
+        suffix_text = self.game.font.render(suffix, 1, (255, 255, 255))
+        suffix_text_pos = suffix_text.get_rect()
+        suffix_text_pos.midbottom = revenue_rect.midbottom
+        revenue_surface.blit(suffix_text, suffix_text_pos)
+        investment_surface.blit(revenue_surface, (investment_h, 0))
+        # Purchase Surface
+        purchase_w = revenue_w - investment_h
+        purchase_h = revenue_h
+        purchase_surface = pygame.Surface((purchase_w, purchase_h))
+        purchase_rect = purchase_surface.get_rect()
+        purchase_surface.convert()
+        # Buy Text
+        buy_text = self.game.font.render("Buy", 1, (255, 255, 255))
+        buy_text_pos = buy_text.get_rect()
+        buy_text_pos.topleft = purchase_rect.topleft
+        purchase_surface.blit(buy_text, buy_text_pos)
+        # Buy Quantity Text
+        buy_quantity_text = self.game.font.render("x" + "1", 1, (255, 255, 255))
+        buy_quantity_text_pos = buy_quantity_text.get_rect()
+        buy_quantity_text_pos.bottomleft = purchase_rect.bottomleft
+        purchase_surface.blit(buy_quantity_text, buy_quantity_text_pos)
+        # Cost Text
+        cost, suffix = truncate_value(self.cost)
+        cost_text = self.game.font.render(format(cost, '6.2f'), 1, (255, 255, 255))
+        cost_text_pos = cost_text.get_rect()
+        cost_text_pos.topright = purchase_rect.topright
+        purchase_surface.blit(cost_text, cost_text_pos)
+        # Cost Suffix Text
+        suffix_text = self.game.font.render(suffix, 1, (255, 255, 255))
+        suffix_text_pos = suffix_text.get_rect()
+        suffix_text_pos.bottomright = purchase_rect.bottomright
+        purchase_surface.blit(suffix_text, suffix_text_pos)
+        investment_surface.blit(purchase_surface, (investment_h, revenue_h))
+        # Time Surface
+        time_w = revenue_w - purchase_w
+        time_h = purchase_h
+        time_surface = pygame.Surface((time_w, time_h))
+        time_rect = time_surface.get_rect()
+        time_surface.convert()
+        # Time Text
+        time_text = self.game.font.render(format(self.time_left, '.02f'), 1, (255, 255, 255))
+        time_text_pos = time_text.get_rect()
+        time_text_pos.center = time_rect.center
+        time_surface.blit(time_text, time_text_pos)
+        investment_surface.blit(time_surface, (investment_h + purchase_w, revenue_h))
+
+        self.game.background.blit(investment_surface, position)
