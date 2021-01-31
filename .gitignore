@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # Other
-.player_data.json
+player_data.json
