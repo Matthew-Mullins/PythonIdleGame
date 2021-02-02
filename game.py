@@ -1,75 +1,151 @@
 import json
 import math
-
+from enum import Enum
 import pygame
 
 from investment import *
 from player import Player
 from button import Button
 
-class Game:
-    INVESTMENTS_FP = "investments.json"
+class ContentState(Enum):
+    UNLOCKS     = 1
+    UPGRADES    = 2
+    MANAGERS    = 3
+    INVESTORS   = 4
+    INVESTMENTS = 5
 
-    INIT_W = 800
-    INIT_H = 450
+class Color:
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
+
+class Game:
+    # File Paths
+    INVESTMENTS_FP = "investments.json"
+    # Constants
+    AUTO_SAVE_INTERVAL_MS = 1000
+
+    GAME_FPS = 60
+
+    ASPECT_RATIO = 16 / 9
+    INIT_SCREEN_W = 800
+    INIT_SCREEN_H = 450
+    INIT_NAVBAR_W = INIT_SCREEN_W // 4
+    INIT_NAVBAR_H = INIT_SCREEN_H
+    INIT_NAVBAR_X = 0
+    INIT_NAVBAR_Y = 0
+    INIT_BUTTON_W = INIT_NAVBAR_W
+    INIT_BUTTON_H = 50
+    INIT_CONTENT_W = (INIT_SCREEN_W // 4) * 3
+    INIT_CONTENT_H = INIT_SCREEN_H
+    INIT_CONTENT_X = INIT_NAVBAR_W
+    INIT_CONTENT_Y = 0
+
+    FONT_NAME    = "VT323-Regular.ttf"
+    FONT_SIZE_H1 = 48
+    FONT_SIZE_H2 = 40
+    FONT_SIZE_H3 = 32
+    FONT_SIZE_H4 = 24
+    FONT_SIZE_H5 = 16
+    FONT_SIZE_H6 = 8
 
     def __init__(self):
-        # Initialize Screen
+        # Initialize Pygame
         pygame.init()
-        self.screen = pygame.display.set_mode((Game.INIT_W, Game.INIT_H), pygame.RESIZABLE)
-        pygame.display.set_caption('Basic Idle Game')
-        self.font = pygame.font.Font("VT323-Regular.ttf", 16)
+        pygame.display.set_caption('Bits and Bytes')
 
         # Initialize Clock
         self.clock = pygame.time.Clock()
 
-        # Custom Events
+        # Custom User Events
         self.AUTO_SAVE = pygame.USEREVENT + 1
-        pygame.time.set_timer(self.AUTO_SAVE, 1000)
+        pygame.time.set_timer(self.AUTO_SAVE, Game.AUTO_SAVE_INTERVAL_MS)
 
-        # Fill Background
+        # Create Player Object
+        self.player = Player(self)
+        self.player.load(Game.INVESTMENTS_FP)
+
+        # Set Default Font Sizes
+        self.font_h1 = pygame.font.Font(Game.FONT_NAME, Game.FONT_SIZE_H1)
+        self.font_h2 = pygame.font.Font(Game.FONT_NAME, Game.FONT_SIZE_H2)
+        self.font_h3 = pygame.font.Font(Game.FONT_NAME, Game.FONT_SIZE_H3)
+        self.font_h4 = pygame.font.Font(Game.FONT_NAME, Game.FONT_SIZE_H4)
+        self.font_h5 = pygame.font.Font(Game.FONT_NAME, Game.FONT_SIZE_H5)
+        self.font_h6 = pygame.font.Font(Game.FONT_NAME, Game.FONT_SIZE_H6)
+
+        # Create Surfaces
+        self.screen = pygame.display.set_mode((Game.INIT_SCREEN_W, Game.INIT_SCREEN_H), pygame.RESIZABLE)
+        # Background -> Screen
         self.background = pygame.Surface(self.screen.get_size())
         self.background = self.background.convert()
-        self.background.fill((0, 0, 0))
+        # NavBar -> Background
+        self.nav_bar = pygame.Surface((Game.INIT_NAVBAR_W, Game.INIT_NAVBAR_H))
+        self.nav_bar = self.nav_bar.convert()
+        # Content -> Background
+        self.content = pygame.Surface((Game.INIT_CONTENT_W, Game.INIT_CONTENT_H))
+        self.content = self.content.convert()
 
-        # Create Player Object to Track Saveable Data
-        self.player = Player(self)
+        # Create Buttons
+        unlock_button = Button(self, 'UNLOCKS', ContentState.UNLOCKS, self.set_state)
+        upgrade_button = Button(self, 'UPGRADES', ContentState.UPGRADES, self.set_state)
+        manager_button = Button(self, 'MANAGERS', ContentState.MANAGERS, self.set_state)
+        investor_button = Button(self, 'INVESTORS', ContentState.INVESTORS, self.set_state)
+        investment_button = Button(self, 'INVESTMENTS', ContentState.INVESTMENTS, self.set_state)
+        self.nav_bar_buttons = [
+            unlock_button,
+            upgrade_button,
+            manager_button,
+            investor_button,
+            investment_button
+        ]
 
-        # Instantiate Investments from Json
-        with open(Game.INVESTMENTS_FP, "r") as f:
-            data = json.load(f)
-            for investment_dict in data.get('investments'):
-                self.player.investments[investment_dict.get('type')] = Investment(self, investment_dict)
+        # Initial State
+        self.set_state(ContentState.INVESTMENTS)
 
-        # Load Player Save
-        self.player.load()
 
-        # Event Loop
-        while True:
-            self.clock.tick(60)
+    def run(self):
+        # Exit Condition
+        running = True
+        while running:
+            # Advance Clock
+            self.clock.tick(Game.GAME_FPS)
 
-            self.background.fill((10, 10, 10))
+            # Clear Surfaces
+            self.background.fill(Color.WHITE)
+            self.nav_bar.fill((0, 128, 0))
+            self.content.fill((0, 0, 128))
 
+            # Event Loop
             for event in pygame.event.get():
+                # Close Event
                 if event.type == pygame.QUIT:
-                    return
+                    running = False
+                    break
+                # Resize Event
                 if event.type == pygame.VIDEORESIZE:
-                    # Maintain Aspect Ratio
-                    ASPECT_RATIO = 16. / 9.
                     # Get New Screen Size
-                    new_screen_size = event.dict['size']
-                    # Calculate Background Size to Fit Screen
-                    if new_screen_size[0] > ASPECT_RATIO * new_screen_size[1]:
-                        new_screen_height = int(new_screen_size[1])
-                        new_screen_width = int(new_screen_height * ASPECT_RATIO)
-                    else :
-                        new_screen_width = int(new_screen_size[0])
-                        new_screen_height = int(new_screen_width / ASPECT_RATIO)
-                    self.screen = pygame.display.set_mode(event.dict['size'], pygame.RESIZABLE)
-                    self.background = pygame.transform.scale(self.background, (new_screen_width, new_screen_height))
-                    self.font = pygame.font.Font("VT323-Regular.ttf", int(16 * new_screen_height / 450))
+                    new_screen_size = event.dict.get('size')
+                    # Calculate New Background Size
+                    if new_screen_size[0] > Game.ASPECT_RATIO * new_screen_size[1]:
+                        new_background_h = int(new_screen_size[1])
+                        new_background_w = int(new_background_h * Game.ASPECT_RATIO)
+                    else:
+                        new_background_w = int(new_screen_size[0])
+                        new_background_h = int(new_background_w / Game.ASPECT_RATIO)
+                    # Resize Screen
+                    self.screen = pygame.display.set_mode(new_screen_size, pygame.RESIZABLE)
+                    # Resize Background
+                    self.background = pygame.transform.scale(self.background, (new_background_w, new_background_h))
+                    # Resize NavBar
+                    self.nav_bar = pygame.transform.scale(self.nav_bar, (int(Game.INIT_NAVBAR_W * new_background_w / Game.INIT_SCREEN_W), int(Game.INIT_NAVBAR_H * new_background_h / Game.INIT_SCREEN_H)))
+                        # Resize NavBar Elements
+                    #Resize Content
+                    self.content = pygame.transform.scale(self.content, (int(Game.INIT_CONTENT_W * new_background_w / Game.INIT_SCREEN_W), int(Game.INIT_CONTENT_H * new_background_h / Game.INIT_SCREEN_H)))
+                        # Resize Content Elements
+                    pass
+                # Auto Save Event
                 if event.type == self.AUTO_SAVE:
                     self.player.save()
+                # Purchase Investment Events
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_1:
                     investment = self.player.investments["lemonade_stand"]
                     investment.purchase()
@@ -100,26 +176,73 @@ class Game:
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_0:
                     investment = self.player.investments["oil_company"]
                     investment.purchase()
-                
-            self.draw_currency()
-            index = 0
+
+            # Update Investments
             for investment in self.player.investments.values():
                 investment.update(self)
-                investment.render((int(190 * self.background.get_width() / 800) + (index % 2) * int(305 * self.background.get_width() / 800), int(25 * self.background.get_height() / 450) + (int(index / 2)) * int(85 * self.background.get_height() / 450)))
-                index += 1
-            # Blit Everything to Screen
-            center_background_w = self.screen.get_width() // 2 - self.background.get_width() // 2
-            center_background_h = self.screen.get_height() // 2 - self.background.get_height() // 2
+
+            # Draw Elements on NavBar
+            render_navbar(self)
+            # Draw Elements on Content
+            render_content(self)
+            # Draw Elements on Background
+
+            # Blit NavBar on Background
+            self.background.blit(self.nav_bar, self.nav_bar.get_rect(topleft=(0, 0)))
+            # Blit Content on Background
+            self.background.blit(self.content, self.content.get_rect(topleft=self.nav_bar.get_rect().topright))
+
+            # Blit Background on Screen
+            half_screen_w = self.screen.get_width() // 2
+            half_screen_h = self.screen.get_height() // 2
+            half_background_w = self.background.get_width() // 2
+            half_background_h = self.background.get_height() // 2
+            center_background_w = half_screen_w - half_background_w
+            center_background_h = half_screen_h - half_background_h
             self.screen.blit(self.background, (center_background_w, center_background_h))
+
+            # Flip Display
             pygame.display.flip()
 
+        # Close Application
         pygame.quit()
         quit()
 
-    def draw_currency(self):
-        # Display Text
-        currency, suffix = truncate_value(self.player.currency)
-        text = self.font.render('$' + format(currency, '6.2f') + ' ' + suffix, 1, (255, 255, 255))
-        textpos = text.get_rect()
-        textpos.midtop = self.background.get_rect().midtop
-        self.background.blit(text, textpos)
+    def set_state(self, state):
+        self.content_state = state
+
+def render_navbar(game):
+    currency, suffix = truncate_value(game.player.currency)
+    # Currency
+    currency_font = pygame.font.Font(Game.FONT_NAME, int(Game.FONT_SIZE_H1 * game.nav_bar.get_height() / Game.INIT_NAVBAR_H))
+    currency_text = currency_font.render('$' + format(currency, '6.2f'), 1, (255, 255, 255))
+    currency_text_rect = currency_text.get_rect()
+    currency_text_rect.midtop = game.nav_bar.get_rect().midtop
+    game.nav_bar.blit(currency_text, currency_text_rect)
+    # Suffix
+    suffix_font = pygame.font.Font(Game.FONT_NAME, int(Game.FONT_SIZE_H4 * game.nav_bar.get_height() / Game.INIT_NAVBAR_H))
+    suffix_text = suffix_font.render(suffix, 1, (255, 255, 255))
+    suffix_text_rect = suffix_text.get_rect()
+    suffix_text_rect.midtop = currency_text_rect.midbottom
+    game.nav_bar.blit(suffix_text, suffix_text_rect)
+    # Draw Buttons
+    button_font = pygame.font.Font(Game.FONT_NAME, int(Game.FONT_SIZE_H2 * game.nav_bar.get_height() / Game.INIT_NAVBAR_H))
+    button_spacing = int(10 * game.nav_bar.get_height() / Game.INIT_NAVBAR_H)
+    button_w = int(Game.INIT_BUTTON_W * game.nav_bar.get_width() / Game.INIT_NAVBAR_W)
+    button_h = int(Game.INIT_BUTTON_H * game.nav_bar.get_height() / Game.INIT_NAVBAR_H)
+    for i in range(len(game.nav_bar_buttons)):
+        midtop = (suffix_text_rect.midbottom[0], suffix_text_rect.midbottom[1] + int(button_h) * i + button_spacing * (i + 2))
+        button = game.nav_bar_buttons[i]
+        if button.render((button_w, button_h), midtop):
+            button.function(button.state)
+
+def render_content(game):
+    if game.content_state == ContentState.INVESTMENTS:
+        index = 0
+        for investment in game.player.investments.values():
+            spacing_w = int(Investment.INIT_SPACING * game.content.get_width() / game.INIT_CONTENT_W)
+            spacing_h = int(Investment.INIT_SPACING * game.content.get_height() / game.INIT_CONTENT_H)
+            investment_x = int(spacing_w + spacing_w * math.floor(index / 5) + math.floor(index / 5) * Investment.INIT_INVESTMENT_W * game.content.get_width() / Game.INIT_CONTENT_W)
+            investment_y = int(spacing_h + spacing_h * (index % 5) + (index % 5) * Investment.INIT_INVESTMENT_H * game.content.get_height() / Game.INIT_CONTENT_H)
+            investment.render(game.content, (investment_x, investment_y))
+            index += 1

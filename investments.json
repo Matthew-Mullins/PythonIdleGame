@@ -2,83 +2,805 @@
     "investments": [
         {
             "type": "lemonade_stand",
-            "name": "[1] Lemonade Stand",
+            "name": "Lemonade Stand",
             "initial_cost": 3.738,
             "coefficient": 1.07,
             "initial_time": 0.6,
-            "initial_revenue": 1
+            "initial_revenue": 1,
+            "unlocks": [
+                {
+                    "goal": 25,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 50,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 100,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 200,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 300,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 400,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 500,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 1,
+                    "profit_effect": 4
+                },
+                {
+                    "goal": 600,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 1,
+                    "profit_effect": 4
+                },
+                {
+                    "goal": 700,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 1,
+                    "profit_effect": 4
+                },
+                {
+                    "goal": 800,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 1,
+                    "profit_effect": 4
+                },
+                {
+                    "goal": 900,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 1,
+                    "profit_effect": 4
+                },
+                {
+                    "goal": 1000,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 1,
+                    "profit_effect": 5
+                }
+            ]
         },
         {
             "type": "newspaper_delivery",
-            "name": "[2] Newspaper Delivery",
+            "name": "Newspaper Delivery",
             "initial_cost": 60,
             "coefficient": 1.15,
             "initial_time": 3,
-            "initial_revenue": 60
+            "initial_revenue": 60,
+            "unlocks": [
+                {
+                    "goal": 25,
+                    "target_investment": "newspaper_delivery",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 50,
+                    "target_investment": "newspaper_delivery",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 100,
+                    "target_investment": "newspaper_delivery",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 125,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 150,
+                    "target_investment": "car_wash",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 175,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 200,
+                    "target_investment": "newspaper_delivery",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 225,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 250,
+                    "target_investment": "lemonade_stand",
+                    "speed_effect": 1,
+                    "profit_effect": 3
+                }
+            ]
         },
         {
             "type": "car_wash",
-            "name": "[3] Car Wash",
+            "name": "Car Wash",
             "initial_cost": 720,
             "coefficient": 1.14,
             "initial_time": 6,
-            "initial_revenue": 540
+            "initial_revenue": 540,
+            "unlocks": [
+                {
+                    "goal": 25,
+                    "target_investment": "car_wash",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 50,
+                    "target_investment": "car_wash",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 100,
+                    "target_investment": "car_wash",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 200,
+                    "target_investment": "car_wash",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 300,
+                    "target_investment": "car_wash",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 400,
+                    "target_investment": "car_wash",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 500,
+                    "target_investment": "car_wash",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 600,
+                    "target_investment": "car_wash",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 700,
+                    "target_investment": "car_wash",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 800,
+                    "target_investment": "car_wash",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 900,
+                    "target_investment": "car_wash",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 1000,
+                    "target_investment": "car_wash",
+                    "speed_effect": 1,
+                    "profit_effect": 3
+                }
+            ]
         },
         {
             "type": "pizza_delivery",
-            "name": "[4] Pizza Delivery",
+            "name": "Pizza Delivery",
             "initial_cost": 8640,
             "coefficient": 1.13,
             "initial_time": 12,
-            "initial_revenue": 4320
+            "initial_revenue": 4320,
+            "unlocks": [
+                {
+                    "goal": 25,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 50,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 100,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 200,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 300,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 400,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 500,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 600,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 700,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 800,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 900,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 1000,
+                    "target_investment": "pizza_delivery",
+                    "speed_effect": 1,
+                    "profit_effect": 3
+                }
+            ]
         },
         {
             "type": "donut_shop",
-            "name": "[5] Donut Shop",
+            "name": "Donut Shop",
             "initial_cost": 103680,
             "coefficient": 1.12,
             "initial_time": 24,
-            "initial_revenue": 51840
+            "initial_revenue": 51840,
+            "unlocks": [
+                {
+                    "goal": 25,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 50,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 100,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 200,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 300,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 400,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 500,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 600,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 700,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 800,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 900,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 1000,
+                    "target_investment": "donut_shop",
+                    "speed_effect": 1,
+                    "profit_effect": 3
+                }
+            ]
         },
         {
             "type": "shrimp_boat",
-            "name": "[6] Shrimp Boat",
+            "name": "Shrimp Boat",
             "initial_cost": 1244160,
             "coefficient": 1.11,
             "initial_time": 96,
-            "initial_revenue": 622080
+            "initial_revenue": 622080,
+            "unlocks": [
+                {
+                    "goal": 25,
+                    "target_investment": "shrimp_boat",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 50,
+                    "target_investment": "shrimp_boat",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 100,
+                    "target_investment": "shrimp_boat",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 200,
+                    "target_investment": "shrimp_boat",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 300,
+                    "target_investment": "shrimp_boat",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 400,
+                    "target_investment": "shrimp_boat",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 500,
+                    "target_investment": "shrimp_boat",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 600,
+                    "target_investment": "shrimp_boat",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 700,
+                    "target_investment": "shrimp_boat",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 800,
+                    "target_investment": "shrimp_boat",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 900,
+                    "target_investment": "shrimp_boat",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 1000,
+                    "target_investment": "shrimp_boat",
+                    "speed_effect": 1,
+                    "profit_effect": 3
+                }
+            ]
         },
         {
             "type": "hockey_team",
-            "name": "[7] Hockey Team",
+            "name": "Hockey Team",
             "initial_cost": 14929920,
             "coefficient": 1.10,
             "initial_time": 384,
-            "initial_revenue": 7464960
+            "initial_revenue": 7464960,
+            "unlocks": [
+                {
+                    "goal": 25,
+                    "target_investment": "hockey_team",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 50,
+                    "target_investment": "hockey_team",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 100,
+                    "target_investment": "hockey_team",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 200,
+                    "target_investment": "hockey_team",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 300,
+                    "target_investment": "hockey_team",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 400,
+                    "target_investment": "hockey_team",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 500,
+                    "target_investment": "hockey_team",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 600,
+                    "target_investment": "hockey_team",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 700,
+                    "target_investment": "hockey_team",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 800,
+                    "target_investment": "hockey_team",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 900,
+                    "target_investment": "hockey_team",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 1000,
+                    "target_investment": "hockey_team",
+                    "speed_effect": 1,
+                    "profit_effect": 3
+                }
+            ]
         },
         {
             "type": "movie_studio",
-            "name": "[8] Movie Studio",
+            "name": "Movie Studio",
             "initial_cost": 179159040,
             "coefficient": 1.09,
             "initial_time": 1536,
-            "initial_revenue": 89579520
+            "initial_revenue": 89579520,
+            "unlocks": [
+                {
+                    "goal": 25,
+                    "target_investment": "movie_studio",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 50,
+                    "target_investment": "movie_studio",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 100,
+                    "target_investment": "movie_studio",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 200,
+                    "target_investment": "movie_studio",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 300,
+                    "target_investment": "movie_studio",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 400,
+                    "target_investment": "movie_studio",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 500,
+                    "target_investment": "movie_studio",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 600,
+                    "target_investment": "movie_studio",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 700,
+                    "target_investment": "movie_studio",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 800,
+                    "target_investment": "movie_studio",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 900,
+                    "target_investment": "movie_studio",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 1000,
+                    "target_investment": "movie_studio",
+                    "speed_effect": 1,
+                    "profit_effect": 3
+                }
+            ]
         },
         {
             "type": "bank",
-            "name": "[9] Bank",
+            "name": "Bank",
             "initial_cost": 2149908480,
             "coefficient": 1.08,
             "initial_time": 6144,
-            "initial_revenue": 1074954240
+            "initial_revenue": 1074954240,
+            "unlocks": [
+                {
+                    "goal": 25,
+                    "target_investment": "bank",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 50,
+                    "target_investment": "bank",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 100,
+                    "target_investment": "bank",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 200,
+                    "target_investment": "bank",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 300,
+                    "target_investment": "bank",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 400,
+                    "target_investment": "bank",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 500,
+                    "target_investment": "bank",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 600,
+                    "target_investment": "bank",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 700,
+                    "target_investment": "bank",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 800,
+                    "target_investment": "bank",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 900,
+                    "target_investment": "bank",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 1000,
+                    "target_investment": "bank",
+                    "speed_effect": 1,
+                    "profit_effect": 3
+                }
+            ]
         },
         {
             "type": "oil_company",
-            "name": "[0] Oil Company",
+            "name": "Oil Company",
             "initial_cost": 25798901760,
             "coefficient": 1.07,
             "initial_time": 36864,
-            "initial_revenue": 29688737024
+            "initial_revenue": 29688737024,
+            "unlocks": [
+                {
+                    "goal": 25,
+                    "target_investment": "oil_company",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 50,
+                    "target_investment": "oil_company",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 100,
+                    "target_investment": "oil_company",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 200,
+                    "target_investment": "oil_company",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 300,
+                    "target_investment": "oil_company",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 400,
+                    "target_investment": "oil_company",
+                    "speed_effect": 2,
+                    "profit_effect": 1
+                },
+                {
+                    "goal": 500,
+                    "target_investment": "oil_company",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 600,
+                    "target_investment": "oil_company",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 700,
+                    "target_investment": "oil_company",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 800,
+                    "target_investment": "oil_company",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 900,
+                    "target_investment": "oil_company",
+                    "speed_effect": 1,
+                    "profit_effect": 2
+                },
+                {
+                    "goal": 1000,
+                    "target_investment": "oil_company",
+                    "speed_effect": 1,
+                    "profit_effect": 3
+                }
+            ]
         }
     ]
 }

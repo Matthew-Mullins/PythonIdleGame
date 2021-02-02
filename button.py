@@ -8,49 +8,51 @@ class Button:
     COLOR_BORDER_DARK = (128, 128, 128)
     COLOR_BORDER_LIGHT = (255, 255, 255)
 
-    def __init__(self, game, x, y, width, height, text):
+    def __init__(self, game, text, state, function):
         self.game = game
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
         self.text = text
-
+        self.state = state
+        self.function = function
         self.clicked = False
         self.action = False
 
-    def render(self):
+    def render(self, size, position):
         # Reset Action
         self.action = False
 
         # Get Cursor Position
         cur_pos = pygame.mouse.get_pos()
 
-        # Create pygame Rect for Button
-        button_rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        # Button Surface
+        button_surface = pygame.Surface(size)
+        button_surface_rect = button_surface.get_rect()
+        button_surface_rect.midtop = position
+        button_surface.convert()
 
         # Check Mouse Over and Click Conditions
-        if button_rect.collidepoint(cur_pos):
+        if button_surface_rect.collidepoint(cur_pos):
             if pygame.mouse.get_pressed()[0] == 1:
                 self.clicked = True
-                pygame.draw.rect(self.game.background, Button.COLOR_CLICK, button_rect)
+                button_surface.fill(Button.COLOR_CLICK)
             elif pygame.mouse.get_pressed()[0] == 0 and self.clicked:
                 self.clicked = False
                 self.action = True
             else:
-                pygame.draw.rect(self.game.background, Button.COLOR_HOVER, button_rect)
+                button_surface.fill(Button.COLOR_HOVER)
         else:
-            pygame.draw.rect(self.game.background, Button.COLOR_BACKGROUND, button_rect)
+            button_surface.fill(Button.COLOR_BACKGROUND)
 
         # Add Button Shading
-        pygame.draw.line(self.game.background, Button.COLOR_BORDER_LIGHT, (self.x, self.y), (self.x + self.width, self.y), 2)
-        pygame.draw.line(self.game.background, Button.COLOR_BORDER_LIGHT, (self.x, self.y), (self.x, self.y + self.height), 2)
-        pygame.draw.line(self.game.background, Button.COLOR_BORDER_DARK,  (self.x, self.y + self.height), (self.x + self.width, self.y + self.height), 2)
-        pygame.draw.line(self.game.background, Button.COLOR_BORDER_DARK,  (self.x + self.width, self.y), (self.x + self.width, self.y + self.height), 2)
+        pygame.draw.line(button_surface, Button.COLOR_BORDER_LIGHT, (0, 0), (size[0], 0), 2)
+        pygame.draw.line(button_surface, Button.COLOR_BORDER_LIGHT, (0, 0), (0, size[1]), 2)
+        pygame.draw.line(button_surface, Button.COLOR_BORDER_DARK,  (size[0] - 2, size[1] - 2), (size[0] - 2, -2), 2)
+        pygame.draw.line(button_surface, Button.COLOR_BORDER_DARK,  (size[0] - 2, size[1] - 2), (-2, size[1] - 2), 2)
 
         # Add Text to Button
-        text_img = self.game.font.render(self.text, True, Button.COLOR_TEXT)
+        button_font = pygame.font.Font(self.game.FONT_NAME, int(self.game.FONT_SIZE_H3 * size[1] / self.game.INIT_BUTTON_H))
+        text_img = button_font.render(self.text, 1, Button.COLOR_TEXT)
         text_w = text_img.get_width()
         text_h = text_img.get_height()
-        self.game.background.blit(text_img, (self.x + self.width // 2 - text_w // 2, self.y + self.height // 2 - text_h // 2))
+        button_surface.blit(text_img, (size[0] // 2 - text_w // 2, size[1] // 2 - text_h // 2))
+        self.game.nav_bar.blit(button_surface, button_surface_rect)
         return self.action

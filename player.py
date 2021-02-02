@@ -1,6 +1,8 @@
 import os
 import json
 
+from investment import Investment
+
 class Player:
     SAVE_FP = "save.json"
 
@@ -9,6 +11,7 @@ class Player:
 
         # Inialize Values
         self.currency = 0
+        self.revenue_scale = 1
         self.unlocks = {}
         self.upgrades = {}
         self.managers = {}
@@ -21,12 +24,20 @@ class Player:
             investment_data[_type] = investment.quantity
         save_data = {
             "currency": self.currency,
+            "revenue_scale": self.revenue_scale,
             "investments": investment_data
         }
         with open("save.json", "w") as f:
             json.dump(save_data, f)
 
-    def load(self):
+    def load(self, investments_fp):
+        # Load Investment Json and Create Objects
+        with open(investments_fp, "r") as f:
+            data = json.load(f)
+            for investment_dict in data.get('investments'):
+                self.investments[investment_dict.get('type')] = Investment(self.game, investment_dict)
+
+        # Load Save Data
         if os.path.exists(Player.SAVE_FP):
             # Load File
             with open(Player.SAVE_FP, "r") as f:
@@ -38,22 +49,3 @@ class Player:
         else:
             # Upgrade First Lemonade Stand
             self.investments.get('lemonade_stand').upgrade()
-        
-
-
-        # # Try to Load Player Data from File
-        # try:
-        #     f = open("player_data.json", "r")
-        #     player_data = json.load(f)
-        #     self.currency = player_data['currency']
-        #     for investment in self.investments.values():
-        #         if investment.type == 'lemonade_stand' and player_data['investments'][investment.type] == 0:
-        #             investment.upgrade()
-        #             continue
-        #         for i in range(player_data['investments'][investment.type]):
-        #             investment.upgrade()
-        #     f.close()
-        # except:
-        #     for investment in self.investments.values():
-        #         if investment.type == 'lemonade_stand':
-        #             investment.upgrade()
