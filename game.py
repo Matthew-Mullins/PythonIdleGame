@@ -79,9 +79,12 @@ class Game:
         self.background = self.background.convert()
         # NavBar -> Background
         self.nav_bar = pygame.Surface((Game.INIT_NAVBAR_W, Game.INIT_NAVBAR_H))
+        self.nav_bar_rect = self.nav_bar.get_rect()
         self.nav_bar = self.nav_bar.convert()
         # Content -> Background
         self.content = pygame.Surface((Game.INIT_CONTENT_W, Game.INIT_CONTENT_H))
+        self.content_rect = self.content.get_rect()
+        self.content_rect.topleft = self.nav_bar_rect.topright
         self.content = self.content.convert()
 
         # Create Buttons
@@ -114,6 +117,8 @@ class Game:
             self.nav_bar.fill((0, 128, 0))
             self.content.fill((0, 0, 128))
 
+            # Reset Mouse Buttons
+            self.mouse_buttons_pressed = (False, False, False, False, False)
             # Event Loop
             for event in pygame.event.get():
                 # Close Event
@@ -145,6 +150,9 @@ class Game:
                 # Auto Save Event
                 if event.type == self.AUTO_SAVE:
                     self.player.save()
+                # Check Mouse Button Press
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    self.mouse_buttons_pressed = (event.button == 1, event.button == 2, event.button == 3, event.button == 4, event.button == 5)
                 # Purchase Investment Events
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_1:
                     investment = self.player.investments["lemonade_stand"]
@@ -181,16 +189,14 @@ class Game:
             for investment in self.player.investments.values():
                 investment.update(self)
 
+            # Blit NavBar on Background
             # Draw Elements on NavBar
             render_navbar(self)
+            self.background.blit(self.nav_bar, self.nav_bar_rect)
+            # Blit Content on Background
             # Draw Elements on Content
             render_content(self)
-            # Draw Elements on Background
-
-            # Blit NavBar on Background
-            self.background.blit(self.nav_bar, self.nav_bar.get_rect(topleft=(0, 0)))
-            # Blit Content on Background
-            self.background.blit(self.content, self.content.get_rect(topleft=self.nav_bar.get_rect().topright))
+            self.background.blit(self.content, self.content_rect)
 
             # Blit Background on Screen
             half_screen_w = self.screen.get_width() // 2
@@ -246,3 +252,52 @@ def render_content(game):
             investment_y = int(spacing_h + spacing_h * (index % 5) + (index % 5) * Investment.INIT_INVESTMENT_H * game.content.get_height() / Game.INIT_CONTENT_H)
             investment.render(game.content, (investment_x, investment_y))
             index += 1
+    elif game.content_state == ContentState.UNLOCKS:
+        index = 0
+        for investment in game.player.investments.values():
+            for unlock in investment.unlocks:
+                if investment.quantity < unlock.get('goal'):
+                    spacing_w = int(Investment.INIT_SPACING * game.content.get_width() / game.INIT_CONTENT_W)
+                    spacing_h = int(Investment.INIT_SPACING * game.content.get_height() / game.INIT_CONTENT_H)
+                    unlock_x = int(spacing_w + spacing_w * math.floor(index / 5) + math.floor(index / 5) * Investment.INIT_INVESTMENT_W * game.content.get_width() / Game.INIT_CONTENT_W)
+                    unlock_y = int(spacing_h + spacing_h * (index % 5) + (index % 5) * Investment.INIT_INVESTMENT_H * game.content.get_height() / Game.INIT_CONTENT_H)
+                    unlock_w = int(Investment.INIT_INVESTMENT_W * game.content.get_width() / game.INIT_CONTENT_W)
+                    unlock_h = int(Investment.INIT_INVESTMENT_H * game.content.get_height() / game.INIT_CONTENT_H)
+                    # Unlock Surface
+                    unlock_surface = pygame.Surface((unlock_w, unlock_h))
+                    unlock_surface_rect = unlock_surface.get_rect()
+                    unlock_surface.convert()
+                    # Investment Name
+                    investment_name_font = pygame.font.Font(game.FONT_NAME, int(game.FONT_SIZE_H4 * unlock_h / Investment.INIT_INVESTMENT_H))
+                    investment_name_text = investment_name_font.render(investment.name, 1, (255, 255, 255))
+                    investment_name_rect = investment_name_text.get_rect()
+                    investment_name_rect.topleft = unlock_surface_rect.topleft
+                    unlock_surface.blit(investment_name_text, investment_name_rect)
+                    # Next Upgrade Quantity
+                    upgrade_quantity_font = pygame.font.Font(game.FONT_NAME, int(game.FONT_SIZE_H4 * unlock_h / Investment.INIT_INVESTMENT_H))
+                    upgrade_quantity_text = upgrade_quantity_font.render('Next: ' + str(unlock.get('goal')), 1, (255, 255, 255))
+                    upgrade_quantity_rect = upgrade_quantity_text.get_rect()
+                    upgrade_quantity_rect.topright = unlock_surface_rect.topright
+                    unlock_surface.blit(upgrade_quantity_text, upgrade_quantity_rect)
+                    # Affected Investment
+                    affected_investment_font = pygame.font.Font(game.FONT_NAME, int(game.FONT_SIZE_H4 * unlock_h / Investment.INIT_INVESTMENT_H))
+                    affected_investment_text = affected_investment_font.render('Affect: ' + str(unlock.get('target_investment')), 1, (255, 255, 255))
+                    affected_investment_rect = upgrade_quantity_text.get_rect()
+                    affected_investment_rect.midleft = unlock_surface_rect.midleft
+                    unlock_surface.blit(affected_investment_text, affected_investment_rect)
+                    # Next Upgrade Effect
+                    effect_font = pygame.font.Font(game.FONT_NAME, int(game.FONT_SIZE_H4 * unlock_h / Investment.INIT_INVESTMENT_H))
+                    effect_text = effect_font.render('Effect: ' + str(unlock.get('speed_effect')) + 'x Sp / ' + str(unlock.get('profit_effect')) + 'x Pr', 1, (255, 255, 255))
+                    effect_rect = effect_text.get_rect()
+                    effect_rect.bottomleft = unlock_surface_rect.bottomleft
+                    unlock_surface.blit(effect_text, effect_rect)
+                    unlock_surface_rect.topleft = (unlock_x, unlock_y)
+                    game.content.blit(unlock_surface, unlock_surface_rect)
+                    break
+            index += 1
+    elif game.content_state == ContentState.UPGRADES:
+        pass
+    elif game.content_state == ContentState.MANAGERS:
+        pass
+    elif game.content_state == ContentState.INVESTORS:
+        pass

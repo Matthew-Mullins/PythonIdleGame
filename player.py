@@ -21,7 +21,11 @@ class Player:
     def save(self):
         investment_data = {}
         for _type, investment in self.investments.items():
-            investment_data[_type] = investment.quantity
+            investment_data_type = {
+                "quantity": investment.quantity,
+                "time_left": investment.time_left
+            }
+            investment_data[_type] = investment_data_type
         save_data = {
             "currency": self.currency,
             "revenue_scale": self.revenue_scale,
@@ -43,9 +47,10 @@ class Player:
             with open(Player.SAVE_FP, "r") as f:
                 player_data_json = json.load(f)
                 self.currency = player_data_json.get('currency')
-                for _type, quantity in player_data_json.get('investments').items():
-                    for _ in range(quantity):
+                for _type, data in player_data_json.get('investments').items():
+                    for _ in range(data.get('quantity')):
                         self.investments.get(_type).upgrade()
+                    self.investments.get(_type).time_left = data.get('time_left')
         else:
             # Upgrade First Lemonade Stand
             self.investments.get('lemonade_stand').upgrade()

@@ -30,7 +30,7 @@ class Button:
         button_surface.convert()
 
         # Check Mouse Over and Click Conditions
-        if button_surface_rect.collidepoint(cur_pos):
+        if button_surface_rect.collidepoint((cur_pos)):
             if pygame.mouse.get_pressed()[0] == 1:
                 self.clicked = True
                 button_surface.fill(Button.COLOR_CLICK)

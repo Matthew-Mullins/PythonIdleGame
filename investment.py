@@ -1,5 +1,6 @@
 import math
 import time
+import operator
 import pygame
 
 def truncate_value(value):
@@ -72,6 +73,7 @@ class Investment:
         self.start_time = time.time()
         self.time = self.initial_time
         self.time_left = self.time
+        self.last_time = time.time()
         self.initial_revenue = inv_dict['initial_revenue']
         self.revenue = 0
         self.revenue_multiple = 1
@@ -90,6 +92,8 @@ class Investment:
         self.upgrade()
 
     def upgrade(self):
+        if self.quantity == 0:
+            self.start_time = time.time()
         self.quantity += 1
         for unlock in self.unlocks:
             if unlock.get('goal') == self.quantity:
@@ -97,13 +101,15 @@ class Investment:
                     if _type == unlock.get('target_investment'):
                         investment.revenue_multiple *= unlock.get('profit_effect')
                         investment.time /= unlock.get('speed_effect')
+                        investment.time_left = min(investment.time_left, investment.time)
         self.revenue = self.quantity * self.initial_revenue * self.revenue_multiple
         self.cost *= self.coefficient
 
     def update(self, game):
         if self.quantity > 0:
             cur_time = time.time()
-            self.time_left = self.start_time + self.time - cur_time
+            self.time_left -= cur_time - self.last_time
+            self.last_time = cur_time
             if self.time_left <= 0:
                 self.time_left = self.time
                 self.start_time = cur_time
@@ -118,23 +124,31 @@ class Investment:
         # Investment Surface
         investment_surface = pygame.Surface((investment_w, investment_h))
         investment_rect = investment_surface.get_rect()
+        investment_rect.topleft = tuple(map(operator.add, self.game.content_rect.topleft, position))
         investment_surface.convert()
         # Add Button
         start_button = pygame.draw.circle(investment_surface, (128, 128, 128), (investment_h // 2, investment_h // 2), investment_h // 2, 2)
+        start_button.topleft = investment_rect.topleft
+        cur_pos = pygame.mouse.get_pos()
+        if start_button.collidepoint(cur_pos):
+            if self.game.mouse_buttons_pressed[0]:
+                self.purchase()
+                
+        # Investment Name
         name_split = self.name.split()
         name_font = pygame.font.Font(self.game.FONT_NAME, int(self.game.FONT_SIZE_H5 * investment_h / Investment.INIT_INVESTMENT_H))
         for i in range(len(name_split)):
             name_text = name_font.render(name_split[i], 1, (255, 255, 255))
             name_text_rect = name_text.get_rect()
-            name_text_rect.midtop = (start_button.midtop[0] + 0, start_button.midtop[1] + int(self.game.FONT_SIZE_H5 * investment_h / Investment.INIT_INVESTMENT_H) + int(self.game.FONT_SIZE_H5 * investment_h / Investment.INIT_INVESTMENT_H) * i)
+            name_text_rect.midtop = tuple(map(operator.sub, start_button.midtop, investment_rect.topleft))
+            name_text_rect.midtop = tuple(map(operator.add, name_text_rect.midtop, (0, int(self.game.FONT_SIZE_H5 * investment_h / Investment.INIT_INVESTMENT_H) + int(self.game.FONT_SIZE_H5 * investment_h / Investment.INIT_INVESTMENT_H) * i)))
             investment_surface.blit(name_text, name_text_rect)
-
         # Investment Quantity
         quantity_font = pygame.font.Font(self.game.FONT_NAME, int(self.game.FONT_SIZE_H3 * investment_h / Investment.INIT_INVESTMENT_H))
         quantity_text = quantity_font.render(str(self.quantity), 1, (255, 255, 255))
-        quantity_text_pos = quantity_text.get_rect()
-        quantity_text_pos.midbottom = start_button.midbottom
-        investment_surface.blit(quantity_text, quantity_text_pos)
+        quantity_text_rect = quantity_text.get_rect()
+        quantity_text_rect.midbottom = tuple(map(operator.sub, start_button.midbottom, investment_rect.topleft)) 
+        investment_surface.blit(quantity_text, quantity_text_rect)
         # Revenue Surface
         revenue_w = investment_w - investment_h
         revenue_h = investment_h // 2
@@ -147,10 +161,10 @@ class Investment:
             height = revenue_h
             progress = 0
             if self.time > 0.15:
-                progress = 1. - ((self.time_left) / (self.time))
+                progress = 1. - max(0, ((self.time_left) / (self.time)))
             else:
                 progress = 1
-            pygame.draw.rect(revenue_surface, (128 - (128 * progress), 0 + (128 * progress), 0), pygame.Rect(revenue_rect.left, revenue_rect.top, revenue_rect.width * progress, revenue_rect.height))
+            pygame.draw.rect(revenue_surface, (128 * (1 - progress), 128 * progress, 0), pygame.Rect(revenue_rect.left, revenue_rect.top, revenue_rect.width * progress, revenue_rect.height))
             pygame.draw.rect(revenue_surface, (128, 128, 128), revenue_rect, 1)
         # Revenue Text
         revenue, suffix = truncate_value(self.revenue)
@@ -205,10 +219,9 @@ class Investment:
         time_surface.convert()
         # Time Text
         time_font = pygame.font.Font(self.game.FONT_NAME, int(self.game.FONT_SIZE_H5 * investment_h / Investment.INIT_INVESTMENT_H))
-        time_text = time_font.render(format(self.time_left if self.time > 0.1 else 0, '05.02f'), 1, (255, 255, 255))
+        time_text = time_font.render(format(self.time_left if self.time > 0.5 else 0, '05.02f'), 1, (255, 255, 255))
         time_text_pos = time_text.get_rect()
         time_text_pos.center = time_rect.center
         time_surface.blit(time_text, time_text_pos)
         investment_surface.blit(time_surface, (investment_h + purchase_w, revenue_h))
-
-        surface.blit(investment_surface, position)
+        surface.blit(investment_surface, tuple(map(operator.sub, investment_rect.topleft, self.game.content_rect.topleft)))
