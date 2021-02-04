@@ -22,6 +22,11 @@ class Button:
 
         # Get Cursor Position
         cur_pos = pygame.mouse.get_pos()
+        scaled_cur_pos_x_bg = (cur_pos[0] - self.game.background_rect.topleft[0]) * (self.game.INIT_SCREEN_W / self.game.background_rect.width)
+        scaled_cur_pos_y_bg = (cur_pos[1] - self.game.background_rect.topleft[1]) * (self.game.INIT_SCREEN_H / self.game.background_rect.height)
+        scaled_cur_pos_x_nav = (scaled_cur_pos_x_bg - self.game.nav_bar_rect.topleft[0]) * (self.game.INIT_NAVBAR_W / self.game.nav_bar_rect.width)
+        scaled_cur_pos_y_nav = (scaled_cur_pos_y_bg - self.game.nav_bar_rect.topleft[1]) * (self.game.INIT_NAVBAR_H / self.game.nav_bar_rect.height)
+        scaled_cur_pos = (scaled_cur_pos_x_nav, scaled_cur_pos_y_nav)
 
         # Button Surface
         button_surface = pygame.Surface(size)
@@ -30,7 +35,7 @@ class Button:
         button_surface.convert()
 
         # Check Mouse Over and Click Conditions
-        if button_surface_rect.collidepoint((cur_pos)):
+        if button_surface_rect.collidepoint((scaled_cur_pos)):
             if pygame.mouse.get_pressed()[0] == 1:
                 self.clicked = True
                 button_surface.fill(Button.COLOR_CLICK)
@@ -49,7 +54,7 @@ class Button:
         pygame.draw.line(button_surface, Button.COLOR_BORDER_DARK,  (size[0] - 2, size[1] - 2), (-2, size[1] - 2), 2)
 
         # Add Text to Button
-        button_font = pygame.font.Font(self.game.FONT_NAME, int(self.game.FONT_SIZE_H3 * size[1] / self.game.INIT_BUTTON_H))
+        button_font = pygame.font.Font(self.game.FONT_NAME, self.game.FONT_SIZE_H3)
         text_img = button_font.render(self.text, 1, Button.COLOR_TEXT)
         text_w = text_img.get_width()
         text_h = text_img.get_height()

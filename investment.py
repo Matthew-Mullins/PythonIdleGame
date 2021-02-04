@@ -119,8 +119,8 @@ class Investment:
         # Surface Width
         surface_w = surface.get_width()
         surface_h = surface.get_height()
-        investment_w = int(Investment.INIT_INVESTMENT_W * surface_w / self.game.INIT_CONTENT_W)
-        investment_h = int(Investment.INIT_INVESTMENT_H * surface_h / self.game.INIT_CONTENT_H)
+        investment_w = Investment.INIT_INVESTMENT_W
+        investment_h = Investment.INIT_INVESTMENT_H
         # Investment Surface
         investment_surface = pygame.Surface((investment_w, investment_h))
         investment_rect = investment_surface.get_rect()
@@ -128,26 +128,35 @@ class Investment:
         investment_surface.convert()
         # Add Button
         start_button = pygame.draw.circle(investment_surface, (128, 128, 128), (investment_h // 2, investment_h // 2), investment_h // 2, 2)
-        start_button.topleft = investment_rect.topleft
+        # Scale Cursor Position
         cur_pos = pygame.mouse.get_pos()
-        if start_button.collidepoint(cur_pos):
+        cur_pos_scaled_bg_x = int((cur_pos[0] - self.game.background_rect.topleft[0]) * (self.game.INIT_SCREEN_W / self.game.background_rect.width))
+        cur_pos_scaled_bg_y = int((cur_pos[1] - self.game.background_rect.topleft[1]) * (self.game.INIT_SCREEN_H / self.game.background_rect.height))
+        cur_pos_scaled_content_x = int((cur_pos_scaled_bg_x - self.game.content_rect.topleft[0]) * (self.game.INIT_CONTENT_W / self.game.content_rect.width))
+        cur_pos_scaled_content_y = int((cur_pos_scaled_bg_y - self.game.content_rect.topleft[1]) * (self.game.INIT_CONTENT_H / self.game.content_rect.height))
+        cur_pos_scaled_inv_x = int((cur_pos_scaled_content_x - position[0]) * (Investment.INIT_INVESTMENT_W / investment_rect.width))
+        cur_pos_scaled_inv_y = int((cur_pos_scaled_content_y - position[1]) * (Investment.INIT_INVESTMENT_H / investment_rect.height))
+        cur_pos_scaled = (cur_pos_scaled_inv_x, cur_pos_scaled_inv_y)
+
+        if start_button.collidepoint(cur_pos_scaled):
+            start_button = pygame.draw.circle(investment_surface, (192, 192, 192), (investment_h // 2, investment_h // 2), investment_h // 2, 2)
             if self.game.mouse_buttons_pressed[0]:
                 self.purchase()
                 
         # Investment Name
         name_split = self.name.split()
-        name_font = pygame.font.Font(self.game.FONT_NAME, int(self.game.FONT_SIZE_H5 * investment_h / Investment.INIT_INVESTMENT_H))
+        name_font = pygame.font.Font(self.game.FONT_NAME, self.game.FONT_SIZE_H5)
         for i in range(len(name_split)):
             name_text = name_font.render(name_split[i], 1, (255, 255, 255))
             name_text_rect = name_text.get_rect()
-            name_text_rect.midtop = tuple(map(operator.sub, start_button.midtop, investment_rect.topleft))
-            name_text_rect.midtop = tuple(map(operator.add, name_text_rect.midtop, (0, int(self.game.FONT_SIZE_H5 * investment_h / Investment.INIT_INVESTMENT_H) + int(self.game.FONT_SIZE_H5 * investment_h / Investment.INIT_INVESTMENT_H) * i)))
+            name_text_rect.midtop = start_button.midtop
+            name_text_rect.midtop = tuple(map(operator.add, name_text_rect.midtop, (0, self.game.FONT_SIZE_H5 + self.game.FONT_SIZE_H5 * i)))
             investment_surface.blit(name_text, name_text_rect)
         # Investment Quantity
-        quantity_font = pygame.font.Font(self.game.FONT_NAME, int(self.game.FONT_SIZE_H3 * investment_h / Investment.INIT_INVESTMENT_H))
+        quantity_font = pygame.font.Font(self.game.FONT_NAME, self.game.FONT_SIZE_H3)
         quantity_text = quantity_font.render(str(self.quantity), 1, (255, 255, 255))
         quantity_text_rect = quantity_text.get_rect()
-        quantity_text_rect.midbottom = tuple(map(operator.sub, start_button.midbottom, investment_rect.topleft)) 
+        quantity_text_rect.midbottom = start_button.midbottom
         investment_surface.blit(quantity_text, quantity_text_rect)
         # Revenue Surface
         revenue_w = investment_w - investment_h
@@ -168,13 +177,13 @@ class Investment:
             pygame.draw.rect(revenue_surface, (128, 128, 128), revenue_rect, 1)
         # Revenue Text
         revenue, suffix = truncate_value(self.revenue)
-        revenue_font = pygame.font.Font(self.game.FONT_NAME, int(self.game.FONT_SIZE_H4 * investment_h / Investment.INIT_INVESTMENT_H))
+        revenue_font = pygame.font.Font(self.game.FONT_NAME, self.game.FONT_SIZE_H4)
         revenue_text = revenue_font.render(format(revenue, '.2f'), 1, (255, 255, 255))
         revenue_text_pos = revenue_text.get_rect()
         revenue_text_pos.midtop = revenue_rect.midtop
         revenue_surface.blit(revenue_text, revenue_text_pos)
         # Revenue Suffix Text
-        suffix_font = pygame.font.Font(self.game.FONT_NAME, int(self.game.FONT_SIZE_H5 * investment_h / Investment.INIT_INVESTMENT_H))
+        suffix_font = pygame.font.Font(self.game.FONT_NAME, self.game.FONT_SIZE_H5)
         suffix_text = suffix_font.render(suffix, 1, (255, 255, 255))
         suffix_text_pos = suffix_text.get_rect()
         suffix_text_pos.midbottom = revenue_rect.midbottom
@@ -187,7 +196,7 @@ class Investment:
         purchase_surface.fill((128, 64, 0))
         purchase_rect = purchase_surface.get_rect()
         purchase_surface.convert()
-        purchase_font = pygame.font.Font(self.game.FONT_NAME, int(self.game.FONT_SIZE_H5 * investment_h / Investment.INIT_INVESTMENT_H))
+        purchase_font = pygame.font.Font(self.game.FONT_NAME, self.game.FONT_SIZE_H5)
         # Buy Text
         buy_text = purchase_font.render("Buy", 1, (255, 255, 255))
         buy_text_pos = buy_text.get_rect()
@@ -200,7 +209,7 @@ class Investment:
         purchase_surface.blit(buy_quantity_text, buy_quantity_text_pos)
         # Cost Text
         cost, suffix = truncate_value(self.cost)
-        cost_font = pygame.font.Font(self.game.FONT_NAME, int(self.game.FONT_SIZE_H4 * investment_h / Investment.INIT_INVESTMENT_H))
+        cost_font = pygame.font.Font(self.game.FONT_NAME, self.game.FONT_SIZE_H4)
         cost_text = cost_font.render(format(cost, '6.2f'), 1, (255, 255, 255))
         cost_text_pos = cost_text.get_rect()
         cost_text_pos.topright = purchase_rect.topright
@@ -218,7 +227,7 @@ class Investment:
         time_rect = time_surface.get_rect()
         time_surface.convert()
         # Time Text
-        time_font = pygame.font.Font(self.game.FONT_NAME, int(self.game.FONT_SIZE_H5 * investment_h / Investment.INIT_INVESTMENT_H))
+        time_font = pygame.font.Font(self.game.FONT_NAME, self.game.FONT_SIZE_H5)
         time_text = time_font.render(format(self.time_left if self.time > 0.5 else 0, '05.02f'), 1, (255, 255, 255))
         time_text_pos = time_text.get_rect()
         time_text_pos.center = time_rect.center
