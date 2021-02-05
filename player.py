@@ -14,10 +14,11 @@ class Player:
         # Inialize Values
         self.currency = 0
         self.lifetime_earnings = 0
+        self.starting_lifetime_earnings = 0
         self.unlocks = {}
         self.upgrades = {}
         self.managers = {}
-        self.investors = {}
+        self.investors = 0
         self.investments = {}
 
     def save(self):
@@ -36,9 +37,11 @@ class Player:
         save_data = {
             "currency": self.currency,
             "lifetime_earnings": self.lifetime_earnings,
-            "investments": investment_data,
+            "starting_lifetime_earnings": self.starting_lifetime_earnings,
+            "investors": self.investors,
             "upgrades": upgrades_unlocked,
-            "managers": managers_unlocked
+            "managers": managers_unlocked,
+            "investments": investment_data
         }
         with open("save.json", "w") as f:
             json.dump(save_data, f, indent=4)
@@ -69,6 +72,8 @@ class Player:
                 player_data_json = json.load(f)
                 self.currency = player_data_json.get('currency')
                 self.lifetime_earnings = player_data_json.get('lifetime_earnings')
+                self.starting_lifetime_earnings = player_data_json.get('starting_lifetime_earnings')
+                self.investors = player_data_json.get('investors')
                 for _type, data in player_data_json.get('investments').items():
                     self.investments.get(_type).deserialize(data)
                 for upgrade_name in player_data_json.get('upgrades'):
@@ -81,7 +86,7 @@ class Player:
                             manager.unlock()
         else:
             # Upgrade First Lemonade Stand
-            self.investments.get('lemonade_stand').upgrade()
+            self.investments.get('lemonade_stand').upgrade(1)
         
         print(self.unlocks)
         print(self.upgrades)

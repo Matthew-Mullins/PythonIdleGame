@@ -59,6 +59,7 @@ class Investment:
         self.last_time = 0
         self.revenue = 0
         self.revenue_multiple = 1
+        self.is_managed = False
 
     def start(self):
         if not self.has_started and self.quantity > 0:
@@ -87,7 +88,7 @@ class Investment:
         self.upgrade(quantity)
 
     def get_upgrade_cost(self, quantity):
-        sum = (self.cost * self.cost_scale) * self.coefficient
+        sum = (self.cost * self.cost_scale)
         for i in range(1, quantity):
             sum += sum * self.coefficient
         return sum
@@ -107,7 +108,7 @@ class Investment:
             self.cost *= self.coefficient
 
     def update_revenue(self):
-        self.revenue = self.quantity * self.initial_revenue * self.revenue_multiple
+        self.revenue = self.quantity * self.initial_revenue * self.revenue_multiple * (1 + (self.game.player.investors * 0.02))
 
     def render(self, surface, position=(0, 0)):
         # Surface Width
@@ -193,10 +194,13 @@ class Investment:
         purchase_rect.bottomleft = start_button.bottomright
         purchase_surface.convert()
         purchase_font = pygame.font.Font(self.game.FONT_NAME, self.game.FONT_SIZE_H4)
-        if purchase_rect.collidepoint(cur_pos_scaled):
-            purchase_surface.fill((128, 80, 0))
-            if self.game.mouse_buttons_pressed[0]:
-                self.purchase(1)
+        if self.cost < self.game.player.currency:
+            if purchase_rect.collidepoint(cur_pos_scaled):
+                purchase_surface.fill((128, 80, 0))
+                if self.game.mouse_buttons_pressed[0]:
+                    self.purchase(1)
+        else:
+            purchase_surface.fill((128, 128, 128))
         # Buy Text
         buy_text = purchase_font.render("Buy", 1, (0, 0, 0))
         buy_text_pos = buy_text.get_rect()

@@ -1,5 +1,6 @@
 import json
 import math
+import operator
 from enum import Enum
 import pygame
 
@@ -142,7 +143,7 @@ class Game:
                 # Check Mouse Button Press
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.mouse_buttons_pressed = (event.button == 1, event.button == 2, event.button == 3, event.button == 4, event.button == 5)
-
+                        
             # Update Investments
             for investment in self.player.investments.values():
                 investment.update()
@@ -183,8 +184,18 @@ class Game:
     def set_state(self, state):
         self.content_state = state
 
-    def prestige(self):
-        pass
+    def prestige(self, new_investors):
+        self.player.investors += new_investors
+        self.player.currency = 0
+        self.player.starting_lifetime_earnings = (400000000000 / 9) * math.pow(self.player.investors, 2)
+        for investment in self.player.investments.values():
+            investment.reset()
+            if investment.type == "lemonade_stand":
+                investment.upgrade(1)
+        for manager in self.player.managers.values():
+            manager.unlocked = False
+        for upgrade in self.player.upgrades.values():
+            upgrade.unlocked = False
 
 def render_navbar(game):
     currency, suffix = truncate_value(game.player.currency)
@@ -295,4 +306,43 @@ def render_content(game):
             if manager.render(index):
                 index += 1
     elif game.content_state == ContentState.INVESTORS:
-        pass
+        investor_text = game.font_h1.render('Number of Investors: ' + str(game.player.investors), 1, (255, 255, 255))
+        investor_text_rect = investor_text.get_rect()
+        investor_text_rect.midtop = tuple(map(operator.sub, game.content_rect.midtop, game.content_rect.topleft))
+        game.content.blit(investor_text, investor_text_rect)
+        
+        revenue_gain_text = game.font_h1.render('Revenue Gain: %' + format(game.player.investors * 2, '.02f'), 1, (255, 255, 255))
+        revenue_gain_text_rect = revenue_gain_text.get_rect()
+        revenue_gain_text_rect.midtop = investor_text_rect.midbottom
+        game.content.blit(revenue_gain_text, revenue_gain_text_rect)
+        
+        prestige_button = pygame.Surface((285, 78))
+        prestige_button_rect = prestige_button.get_rect()
+        prestige_button_rect.midtop = revenue_gain_text_rect.midbottom
+        prestige_button.fill((255, 165, 0))
+        
+        cur_pos = pygame.mouse.get_pos()
+        cur_pos_scaled_bg_x = int((cur_pos[0] - game.background_rect.topleft[0]) * game.INIT_SCREEN_W / game.background_rect.width)
+        cur_pos_scaled_bg_y = int((cur_pos[1] - game.background_rect.topleft[1]) * game.INIT_SCREEN_H / game.background_rect.height)
+        cur_pos_scaled_x = int((cur_pos_scaled_bg_x - game.content_rect.topleft[0]) * game.INIT_CONTENT_W / game.content_rect.width)
+        cur_pos_scaled_y = int((cur_pos_scaled_bg_y - game.content_rect.topleft[1]) * game.INIT_CONTENT_H / game.content_rect.height)
+        cur_pos_scaled = (cur_pos_scaled_x, cur_pos_scaled_y)
+
+        # Lifetime earnings/(400 Billion/9)^0.5 - Starting Lifetime earnings/(400 Billion/9)^0.5
+        lifetime_earnings = game.player.lifetime_earnings
+        first = float(lifetime_earnings / math.sqrt(float(400000000000 / 9)))
+        starting_lifetime_earnings = game.player.starting_lifetime_earnings
+        second = float(starting_lifetime_earnings / math.sqrt(float(400000000000 / 9)))
+        angels_earned = 0 if math.floor(first - second) < 0 else math.floor(first - second)
+
+        if prestige_button_rect.collidepoint(cur_pos_scaled):
+            prestige_button.fill((128, 80, 0))
+            if game.mouse_buttons_pressed[0]:
+                game.prestige(angels_earned)
+
+        new_angels_text = game.font_h1.render(str(angels_earned), 1, (255, 255, 255))
+        new_angels_text_rect = new_angels_text.get_rect()
+        new_angels_text_rect.center = tuple(map(operator.sub, prestige_button_rect.center, prestige_button_rect.topleft))
+        prestige_button.blit(new_angels_text, new_angels_text_rect)
+
+        game.content.blit(prestige_button, prestige_button_rect)
