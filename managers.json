@@ -1,0 +1,104 @@
+{
+    "managers": [
+        {
+            "name": "Cabe Johnson",
+            "type": "lemonade_stand",
+            "cost": 1000,
+            "effects": {
+                "speed": 1,
+                "profit": 1,
+                "cost": 1
+            }
+        },
+        {
+            "name": "Perry Black",
+            "type": "newspaper_delivery",
+            "cost": 15000,
+            "effects": {
+                "speed": 1,
+                "profit": 1,
+                "cost": 1
+            }
+        },
+        {
+            "name": "W.W. Heisenbird",
+            "type": "car_wash",
+            "cost": 100000,
+            "effects": {
+                "speed": 1,
+                "profit": 1,
+                "cost": 1
+            }
+        },
+        {
+            "name": "Mama Sean",
+            "type": "pizza_delivery",
+            "cost": 500000,
+            "effects": {
+                "speed": 1,
+                "profit": 1,
+                "cost": 1
+            }
+        },
+        {
+            "name": "Jim Thorton",
+            "type": "donut_shop",
+            "cost": 1200000,
+            "effects": {
+                "speed": 1,
+                "profit": 1,
+                "cost": 1
+            }
+        },
+        {
+            "name": "Forest Trump",
+            "type": "shrimp_boat",
+            "cost": 10000000,
+            "effects": {
+                "speed": 1,
+                "profit": 1,
+                "cost": 1
+            }
+        },
+        {
+            "name": "Dawn Cheri",
+            "type": "hockey_team",
+            "cost": 111111111,
+            "effects": {
+                "speed": 1,
+                "profit": 1,
+                "cost": 1
+            }
+        },
+        {
+            "name": "Stephani Speilburger",
+            "type": "movie_studio",
+            "cost": 555555555,
+            "effects": {
+                "speed": 1,
+                "profit": 1,
+                "cost": 1
+            }
+        },
+        {
+            "name": "The Dark Lord",
+            "type": "bank",
+            "cost": 10000000000,
+            "effects": {
+                "speed": 1,
+                "profit": 1,
+                "cost": 1
+            }
+        },
+        {
+            "name": "Derrick Plainview",
+            "type": "oil_company",
+            "cost": 100000000000,
+            "effects": {
+                "speed": 1,
+                "profit": 1,
+                "cost": 1
+            }
+        }
+    ]
+}

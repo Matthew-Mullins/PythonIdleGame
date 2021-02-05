@@ -1,0 +1,114 @@
+{
+    "upgrades": [
+        {
+            "name": "Little Umbrellas",
+            "type": "lemonade_stand",
+            "cost": 250000,
+            "description": "Lemonade Stand Profits x3",
+            "effects": {
+                "speed": 1,
+                "profit": 3
+            }
+        },
+        {
+            "name": "Funny Pages",
+            "type": "newspaper_delivery",
+            "cost": 500000,
+            "description": "Newspaper Delivery Profits x3",
+            "effects": {
+                "speed": 1,
+                "profit": 3
+            }
+        },
+        {
+            "name": "Drive Through Wash",
+            "type": "car_wash",
+            "cost": 1000000,
+            "description": "Car Wash Profits x3",
+            "effects": {
+                "speed": 1,
+                "profit": 3
+            }
+        },
+        {
+            "name": "Robot Cars",
+            "type": "pizza_delivery",
+            "cost": 5000000,
+            "description": "Pizza Delivery Profits x3",
+            "effects": {
+                "speed": 1,
+                "profit": 3
+            }
+        },
+        {
+            "name": "Pre-packaged Pastries",
+            "type": "donut_shop",
+            "cost": 10000000,
+            "description": "Donut Shop Profits x3",
+            "effects": {
+                "speed": 1,
+                "profit": 3
+            }
+        },
+        {
+            "name": "Shrimp Satellite",
+            "type": "shrimp_boat",
+            "cost": 25000000,
+            "description": "Shrimp Boat Profits x3",
+            "effects": {
+                "speed": 1,
+                "profit": 3
+            }
+        },
+        {
+            "name": "Team Jet",
+            "type": "hockey_team",
+            "cost": 500000000,
+            "description": "Hockey Team Profits x3",
+            "effects": {
+                "speed": 1,
+                "profit": 3
+            }
+        },
+        {
+            "name": "3D Cameras",
+            "type": "movie_studio",
+            "cost": 10000000000,
+            "description": "Movie Studio Profits x3",
+            "effects": {
+                "speed": 1,
+                "profit": 3
+            }
+        },
+        {
+            "name": "Gold Plated Vaults",
+            "type": "bank",
+            "cost": 50000000000,
+            "description": "Bank Profits x3",
+            "effects": {
+                "speed": 1,
+                "profit": 3
+            }
+        },
+        {
+            "name": "Spill Proof Tankers",
+            "type": "oil_company",
+            "cost": 250000000000,
+            "description": "Oil Company Profits x3",
+            "effects": {
+                "speed": 1,
+                "profit": 3
+            }
+        },
+        {
+            "name": "Monopoly",
+            "type": "all",
+            "cost": 1000000000000,
+            "description": "All Profits x3",
+            "effects": {
+                "speed": 1,
+                "profit": 3
+            }
+        }
+    ]
+}

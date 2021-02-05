@@ -63,57 +63,102 @@ class Investment:
 
     def __init__(self, game, inv_dict):
         self.game = game
+
+        self.type               = inv_dict.get('type')
+        self.name               = inv_dict.get('name')
+        self.initial_cost       = inv_dict.get('initial_cost')
+        self.coefficient        = inv_dict.get('coefficient')
+        self.initial_time       = inv_dict.get('initial_time')
+        self.initial_revenue    = inv_dict.get('initial_revenue')
+        self.unlocks            = inv_dict.get('unlocks')
+        self.has_started        = inv_dict.get('has_started')
+
         self.quantity = 0
-        self.type = inv_dict['type']
-        self.name = inv_dict['name']
-        self.initial_cost = inv_dict['initial_cost']
+        
         self.cost = self.initial_cost
-        self.coefficient = inv_dict['coefficient']
-        self.initial_time = inv_dict['initial_time']
-        self.start_time = time.time()
+        self.cost_scale = 1
+        
         self.time = self.initial_time
-        self.time_left = self.time
-        self.last_time = time.time()
-        self.initial_revenue = inv_dict['initial_revenue']
+        self.time_left = 0
+        self.last_time = 0
+        
         self.revenue = 0
         self.revenue_multiple = 1
-        self.unlocks = inv_dict.get('unlocks')
 
-    def get_upgrade_cost(self, number):
-        sum = self.cost * self.coefficient
-        for i in range(1, number):
-            sum += sum * self.coefficient
-        return sum
+        self.is_managed = False
 
-    def purchase(self):
-        if self.game.player.currency < self.cost:
-            return
-        self.game.player.currency -= self.cost
-        self.upgrade()
+    def serialize(self):
+        investment_dict = {}
+        investment_dict['quantity']     = self.quantity
+        investment_dict['time_left']    = self.time_left
+        investment_dict['has_started']  = self.has_started
+        investment_dict['is_managed']   = self.is_managed
+        return investment_dict
 
-    def upgrade(self):
-        if self.quantity == 0:
-            self.start_time = time.time()
-        self.quantity += 1
-        for unlock in self.unlocks:
-            if unlock.get('goal') == self.quantity:
-                for _type, investment in self.game.player.investments.items():
-                    if _type == unlock.get('target_investment'):
-                        investment.revenue_multiple *= unlock.get('profit_effect')
-                        investment.time /= unlock.get('speed_effect')
-                        investment.time_left = min(investment.time_left, investment.time)
-        self.revenue = self.quantity * self.initial_revenue * self.revenue_multiple
-        self.cost *= self.coefficient
+    def deserialize(self, investment_dict):
+        self.upgrade(investment_dict.get('quantity'))
+        self.time_left = investment_dict.get('time_left')
+        self.last_time = time.time()
+        self.has_started = investment_dict.get('has_started')
 
-    def update(self, game):
-        if self.quantity > 0:
+    def reset(self):
+        self.quantity = 0
+        self.cost = self.initial_cost
+        self.cost_scale = 1
+        self.time = self.initial_time
+        self.time_left = 0
+        self.last_time = 0
+        self.revenue = 0
+        self.revenue_multiple = 1
+
+    def start(self):
+        if not self.has_started and self.quantity > 0:
+            self.has_started = True
+            cur_time = time.time()
+            self.time_left = self.time
+            self.last_time = cur_time
+
+    def update(self):
+        if self.has_started:
             cur_time = time.time()
             self.time_left -= cur_time - self.last_time
             self.last_time = cur_time
             if self.time_left <= 0:
+                self.game.player.currency += self.revenue
+                self.game.player.lifetime_earnings += self.revenue
+                self.has_started = False
                 self.time_left = self.time
-                self.start_time = cur_time
-                self.game.player.currency += self.revenue * self.game.player.revenue_scale
+                if self.is_managed:
+                    self.start()
+
+    def purchase(self, quantity):
+        if self.game.player.currency < self.get_upgrade_cost(quantity):
+            return
+        self.game.player.currency -= self.get_upgrade_cost(quantity)
+        self.upgrade(quantity)
+
+    def get_upgrade_cost(self, quantity):
+        sum = (self.cost * self.cost_scale) * self.coefficient
+        for i in range(1, quantity):
+            sum += sum * self.coefficient
+        return sum
+
+    def upgrade(self, quantity):
+        for _ in range(quantity):
+            self.quantity += 1
+            for unlock in self.unlocks:
+                if unlock.get('goal') == self.quantity:
+                    for _type, investment in self.game.player.investments.items():
+                        if _type == unlock.get('target_investment'):
+                            investment.revenue_multiple *= unlock.get('profit_effect')
+                            investment.time /= unlock.get('speed_effect')
+                            investment.time_left = min(investment.time_left, investment.time)
+                            investment.update_revenue()
+            self.update_revenue()
+            self.cost *= self.coefficient
+
+    def update_revenue(self):
+        self.revenue = self.quantity * self.initial_revenue * self.revenue_multiple
 
     def render(self, surface, position=(0, 0)):
         # Surface Width
@@ -122,10 +167,11 @@ class Investment:
         investment_w = Investment.INIT_INVESTMENT_W
         investment_h = Investment.INIT_INVESTMENT_H
         # Investment Surface
-        investment_surface = pygame.Surface((investment_w, investment_h))
+        investment_surface = pygame.Surface((investment_w, investment_h), pygame.SRCALPHA)
         investment_rect = investment_surface.get_rect()
         investment_rect.topleft = tuple(map(operator.add, self.game.content_rect.topleft, position))
         investment_surface.convert()
+        pygame.draw.rect(investment_surface, (0, 0, 0), pygame.Rect(0, 0, investment_w, investment_h), border_top_left_radius=(investment_h // 2), border_bottom_left_radius=(investment_h // 2))
         # Add Button
         start_button = pygame.draw.circle(investment_surface, (128, 128, 128), (investment_h // 2, investment_h // 2), investment_h // 2, 2)
         # Scale Cursor Position
@@ -141,7 +187,7 @@ class Investment:
         if start_button.collidepoint(cur_pos_scaled):
             start_button = pygame.draw.circle(investment_surface, (192, 192, 192), (investment_h // 2, investment_h // 2), investment_h // 2, 2)
             if self.game.mouse_buttons_pressed[0]:
-                self.purchase()
+                self.start()
                 
         # Investment Name
         name_split = self.name.split()
@@ -193,31 +239,36 @@ class Investment:
         purchase_w = revenue_w - investment_h
         purchase_h = revenue_h
         purchase_surface = pygame.Surface((purchase_w, purchase_h))
-        purchase_surface.fill((128, 64, 0))
+        purchase_surface.fill((255, 165, 0))
         purchase_rect = purchase_surface.get_rect()
+        purchase_rect.bottomleft = start_button.bottomright
         purchase_surface.convert()
-        purchase_font = pygame.font.Font(self.game.FONT_NAME, self.game.FONT_SIZE_H5)
+        purchase_font = pygame.font.Font(self.game.FONT_NAME, self.game.FONT_SIZE_H4)
+        if purchase_rect.collidepoint(cur_pos_scaled):
+            purchase_surface.fill((128, 80, 0))
+            if self.game.mouse_buttons_pressed[0]:
+                self.purchase(1)
         # Buy Text
-        buy_text = purchase_font.render("Buy", 1, (255, 255, 255))
+        buy_text = purchase_font.render("Buy", 1, (0, 0, 0))
         buy_text_pos = buy_text.get_rect()
-        buy_text_pos.topleft = purchase_rect.topleft
+        buy_text_pos.topleft = tuple(map(operator.sub, purchase_rect.topleft, purchase_rect.topleft))
         purchase_surface.blit(buy_text, buy_text_pos)
         # Buy Quantity Text
-        buy_quantity_text = purchase_font.render("x" + "1", 1, (255, 255, 255))
+        buy_quantity_text = purchase_font.render("x" + "1", 1, (0, 0, 0))
         buy_quantity_text_pos = buy_quantity_text.get_rect()
-        buy_quantity_text_pos.bottomleft = purchase_rect.bottomleft
+        buy_quantity_text_pos.bottomleft = tuple(map(operator.sub, purchase_rect.bottomleft, purchase_rect.topleft))
         purchase_surface.blit(buy_quantity_text, buy_quantity_text_pos)
         # Cost Text
-        cost, suffix = truncate_value(self.cost)
+        cost, suffix = truncate_value(self.get_upgrade_cost(1))
         cost_font = pygame.font.Font(self.game.FONT_NAME, self.game.FONT_SIZE_H4)
-        cost_text = cost_font.render(format(cost, '6.2f'), 1, (255, 255, 255))
+        cost_text = cost_font.render(format(cost, '6.2f'), 1, (0, 0, 0))
         cost_text_pos = cost_text.get_rect()
-        cost_text_pos.topright = purchase_rect.topright
+        cost_text_pos.topright = tuple(map(operator.sub, purchase_rect.topright, purchase_rect.topleft))
         purchase_surface.blit(cost_text, cost_text_pos)
         # Cost Suffix Text
-        suffix_text = purchase_font.render(suffix, 1, (255, 255, 255))
+        suffix_text = purchase_font.render(suffix, 1, (0, 0, 0))
         suffix_text_pos = suffix_text.get_rect()
-        suffix_text_pos.bottomright = purchase_rect.bottomright
+        suffix_text_pos.bottomright = tuple(map(operator.sub, purchase_rect.bottomright, purchase_rect.topleft))
         purchase_surface.blit(suffix_text, suffix_text_pos)
         investment_surface.blit(purchase_surface, (investment_h, revenue_h))
         # Time Surface
