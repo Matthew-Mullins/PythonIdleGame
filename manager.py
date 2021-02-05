@@ -2,7 +2,7 @@ import math
 import operator
 import pygame
 
-from investment import truncate_value
+from utility import truncate_value
 
 class Manager:
     INIT_SPACING = 10

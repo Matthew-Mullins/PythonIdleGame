@@ -3,7 +3,8 @@ import math
 from enum import Enum
 import pygame
 
-from investment import *
+from utility import truncate_value
+from investment import Investment
 from player import Player
 from button import Button
 
@@ -54,6 +55,9 @@ class Game:
         # Initialize Pygame
         pygame.init()
         pygame.display.set_caption('Bits and Bytes')
+        game_icon = pygame.image.load('floppy_pixel.png')
+        game_icon = pygame.transform.smoothscale(game_icon, (32, 32))
+        pygame.display.set_icon(game_icon)
 
         # Initialize Clock
         self.clock = pygame.time.Clock()
