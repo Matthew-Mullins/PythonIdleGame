@@ -2,6 +2,7 @@ import math
 import time
 import operator
 import pygame
+from pygame import mixer
 
 from utility import truncate_value
 
@@ -21,6 +22,8 @@ class Investment:
         self.initial_revenue    = inv_dict.get('initial_revenue')
         self.unlocks            = inv_dict.get('unlocks')
         self.has_started        = inv_dict.get('has_started')
+
+        self.sound = mixer.Sound('assets/sounds/{}.wav'.format(self.type))
 
         self.quantity = 0
         
@@ -67,6 +70,8 @@ class Investment:
             cur_time = time.time()
             self.time_left = self.time
             self.last_time = cur_time
+            return True
+        return False
 
     def update(self):
         if self.has_started:
@@ -137,7 +142,8 @@ class Investment:
         if start_button.collidepoint(cur_pos_scaled):
             start_button = pygame.draw.circle(investment_surface, (192, 192, 192), (investment_h // 2, investment_h // 2), investment_h // 2, 2)
             if self.game.mouse_buttons_pressed[0]:
-                self.start()
+                if self.start():
+                    self.sound.play()
                 
         # Investment Name
         name_split = self.name.split()

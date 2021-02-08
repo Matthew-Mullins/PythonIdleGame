@@ -87,8 +87,3 @@ class Player:
         else:
             # Upgrade First Lemonade Stand
             self.investments.get('lemonade_stand').upgrade(1)
-        
-        print(self.unlocks)
-        print(self.upgrades)
-        print(self.managers)
-        print(self.investments)

@@ -3,6 +3,7 @@ import math
 import operator
 from enum import Enum
 import pygame
+from pygame import mixer
 
 from utility import truncate_value
 from investment import Investment
@@ -22,9 +23,10 @@ class Color:
 
 class Game:
     # File Paths
-    INVESTMENTS_FP = "investments.json"
-    UPGRADES_FP = "upgrades.json"
-    MANAGERS_FP = "managers.json"
+    DATA_PATH = "assets/data/"
+    INVESTMENTS_FP = DATA_PATH + "investments.json"
+    UPGRADES_FP = DATA_PATH + "upgrades.json"
+    MANAGERS_FP = DATA_PATH + "managers.json"
     # Constants
     AUTO_SAVE_INTERVAL_MS = 1000
 
@@ -44,7 +46,7 @@ class Game:
     INIT_CONTENT_X = INIT_NAVBAR_W
     INIT_CONTENT_Y = 0
 
-    FONT_NAME    = "VT323-Regular.ttf"
+    FONT_NAME    = "assets/fonts/VT323-Regular.ttf"
     FONT_SIZE_H1 = 48
     FONT_SIZE_H2 = 40
     FONT_SIZE_H3 = 32
@@ -56,7 +58,7 @@ class Game:
         # Initialize Pygame
         pygame.init()
         pygame.display.set_caption('Bits and Bytes')
-        game_icon = pygame.image.load('floppy_pixel.png')
+        game_icon = pygame.image.load('assets/sprites/floppy_pixel.png')
         game_icon = pygame.transform.smoothscale(game_icon, (32, 32))
         pygame.display.set_icon(game_icon)
 
@@ -111,6 +113,11 @@ class Game:
 
         # Initial State
         self.set_state(ContentState.INVESTMENTS)
+
+        # Game Music
+        mixer.music.load('assets/sounds/background.mp3')
+        mixer.music.set_volume(0.2)
+        mixer.music.play(-1)
 
     def run(self):
         # Exit Condition
